@@ -5,6 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import '../services/postos_service.dart';
 import '../models/posto.dart';
 import 'tela_atualizar_preco.dart';
+import 'package:url_launcher/url_launcher.dart'; 
 
 
 class TelaMapa extends StatefulWidget {
@@ -26,7 +27,7 @@ class _TelaMapaState extends State<TelaMapa> {
   List<Posto> _postos = [];
   bool _carregando = true;
   double _raioBusca = 10.0;
-  bool _usarBuscaProximos =true;
+  bool _usarBuscaProximos = true;
 
   @override
   void initState() {
@@ -93,7 +94,31 @@ class _TelaMapaState extends State<TelaMapa> {
       ),
     );
   }
- void _mostrarDetalhePosto(Posto posto) {
+ Future<void> _abrirNavegacao(double latitude, double longitude) async {
+    // Tentar abrir no app de mapas nativo primeiro
+    final geoUrl = Uri.parse('geo:$latitude,$longitude?q=$latitude,$longitude');
+    
+    if (await canLaunchUrl(geoUrl)) {
+      await launchUrl(geoUrl, mode: LaunchMode.externalApplication);
+    } else {
+      // Se não funcionar, tentar Google Maps web
+      final googleMapsUrl = Uri.parse('https://www.google.com/maps/dir/?api=1&destination=$latitude,$longitude');
+      
+      if (await canLaunchUrl(googleMapsUrl)) {
+        await launchUrl(googleMapsUrl, mode: LaunchMode.externalApplication);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Não foi possível abrir o navegador'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+}
+  
+    
+
+} void _mostrarDetalhePosto(Posto posto) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -218,6 +243,25 @@ class _TelaMapaState extends State<TelaMapa> {
                 ),
               ),
             ],
+            SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  _abrirNavegacao(posto.latitude, posto.longitude);
+                },
+                icon: Icon(Icons.navigation),
+                label: Text('Navegar até aqui'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
             SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
