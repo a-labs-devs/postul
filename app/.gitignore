@@ -1,3 +1,7 @@
+# ==================================
+# Flutter/Dart - Postul App
+# ==================================
+
 # Miscellaneous
 *.class
 *.log
@@ -18,20 +22,26 @@ migrate_working_dir/
 *.iws
 .idea/
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
+# VS Code
+# .vscode/
+# Descomente acima se não quiser versionar configurações do VS Code
 
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
+.flutter-plugins
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
 /build/
 /coverage/
+.packages
+pubspec.lock
+
+# Web related
+lib/generated_plugin_registrant.dart
+web/.dart_tool/
 
 # Symbolication related
 app.*.symbols
@@ -43,3 +53,47 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Android specific
+android/.gradle/
+android/captures/
+android/gradlew
+android/gradlew.bat
+android/local.properties
+android/key.properties
+android/**/*.jks
+android/**/*.keystore
+android/**/google-services.json
+android_old/**/google-services.json
+
+# iOS/macOS specific
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+macos/Pods/
+
+# Firebase & API Keys (CRÍTICO)
+**/google-services.json
+**/GoogleService-Info.plist
+**/*-key.json
+**/*firebase*.json
+!firebase.json
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# Test coverage
+coverage/
+test/.test_coverage.dart
+
+# Exceptions
+!.gitkeep

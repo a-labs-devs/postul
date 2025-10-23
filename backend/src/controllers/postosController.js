@@ -96,6 +96,47 @@ const postosController = {
     }
   },
 
+  // Buscar posto por ID (NOVO)
+  buscarPorId: async (req, res) => {
+    const { id } = req.params;
+
+    try {
+      const resultado = await pool.query(
+        `SELECT p.*, 
+                json_agg(
+                  json_build_object(
+                    'tipo', pc.tipo_combustivel,
+                    'preco', pc.preco,
+                    'atualizado_em', pc.data_atualizacao
+                  )
+                ) FILTER (WHERE pc.id IS NOT NULL) as precos
+         FROM postos p
+         LEFT JOIN precos_combustivel pc ON p.id = pc.posto_id
+         WHERE p.id = $1
+         GROUP BY p.id`,
+        [id]
+      );
+
+      if (resultado.rows.length === 0) {
+        return res.status(404).json({
+          sucesso: false,
+          mensagem: 'Posto não encontrado'
+        });
+      }
+
+      res.json({
+        sucesso: true,
+        posto: resultado.rows[0]
+      });
+    } catch (error) {
+      console.error('Erro ao buscar posto:', error);
+      res.status(500).json({
+        sucesso: false,
+        mensagem: 'Erro ao buscar posto'
+      });
+    }
+  },
+
   // Cadastrar novo posto
   cadastrar: async (req, res) => {
     const { nome, endereco, latitude, longitude, telefone, aberto_24h } = req.body;
@@ -125,6 +166,91 @@ const postosController = {
       res.status(500).json({
         sucesso: false,
         mensagem: 'Erro ao cadastrar posto'
+      });
+    }
+  },
+
+  // Editar posto (NOVO)
+  editar: async (req, res) => {
+    const { id } = req.params;
+    const { nome, endereco, latitude, longitude, telefone, aberto_24h } = req.body;
+
+    try {
+      // Verificar se o posto existe
+      const postoExiste = await pool.query(
+        'SELECT id FROM postos WHERE id = $1',
+        [id]
+      );
+
+      if (postoExiste.rows.length === 0) {
+        return res.status(404).json({
+          sucesso: false,
+          mensagem: 'Posto não encontrado'
+        });
+      }
+
+      // Atualizar posto
+      const postoAtualizado = await pool.query(
+        `UPDATE postos 
+         SET nome = $1, 
+             endereco = $2, 
+             latitude = $3, 
+             longitude = $4, 
+             telefone = $5, 
+             aberto_24h = $6,
+             atualizado_em = NOW()
+         WHERE id = $7
+         RETURNING *`,
+        [nome, endereco, latitude, longitude, telefone, aberto_24h, id]
+      );
+
+      res.json({
+        sucesso: true,
+        mensagem: 'Posto atualizado com sucesso',
+        posto: postoAtualizado.rows[0]
+      });
+    } catch (error) {
+      console.error('Erro ao editar posto:', error);
+      res.status(500).json({
+        sucesso: false,
+        mensagem: 'Erro ao editar posto'
+      });
+    }
+  },
+
+  // Deletar posto (NOVO)
+  deletar: async (req, res) => {
+    const { id } = req.params;
+
+    try {
+      // Verificar se o posto existe
+      const postoExiste = await pool.query(
+        'SELECT id FROM postos WHERE id = $1',
+        [id]
+      );
+
+      if (postoExiste.rows.length === 0) {
+        return res.status(404).json({
+          sucesso: false,
+          mensagem: 'Posto não encontrado'
+        });
+      }
+
+      // Deletar preços relacionados primeiro (CASCADE)
+      await pool.query('DELETE FROM precos_combustivel WHERE posto_id = $1', [id]);
+
+      // Deletar posto
+      await pool.query('DELETE FROM postos WHERE id = $1', [id]);
+
+      res.json({
+        sucesso: true,
+        mensagem: 'Posto deletado com sucesso'
+      });
+    } catch (error) {
+      console.error('Erro ao deletar posto:', error);
+      res.status(500).json({
+        sucesso: false,
+        mensagem: 'Erro ao deletar posto'
       });
     }
   }

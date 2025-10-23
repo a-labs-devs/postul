@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
 import 'services/auth_service.dart';
-import '/screens/tela_mapa.dart';
+import 'screens/tela_mapa.dart';
 import 'models/usuario.dart';
-void main() {
+// REMOVIDO: import 'package:firebase_core/firebase_core.dart';
+// TEMPORARIAMENTE DESABILITADO: import 'services/notificacao_proximidade_service.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // REMOVIDO: Firebase (você não precisa dele para notificações locais)
+  // await Firebase.initializeApp();
+
+  // TEMPORARIAMENTE DESABILITADO: Inicializar serviço de notificações locais
+  // await NotificacaoProximidadeService.inicializar();
+
   runApp(AppPostosGasolina());
 }
 
@@ -10,7 +21,7 @@ class AppPostosGasolina extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Postul ',
+      title: 'Postul',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -60,24 +71,24 @@ class _TelaLoginState extends State<TelaLogin> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(resultado['mensagem']),
-            backgroundColor: const Color.fromARGB(255, 252, 242, 255),
+            backgroundColor: Colors.green,
           ),
         );
-        // Navegar para a tela do mapa passando o usuário
-final usuario = resultado['usuario'] as Usuario;
-Navigator.pushReplacement(
-  context,
-  MaterialPageRoute(
-    builder: (context) => TelaMapa(
-      usuarioId: usuario.id,
-    ),
-  ),
-);
+
+        final usuario = resultado['usuario'] as Usuario;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TelaMapa(
+              usuarioId: usuario.id,
+            ),
+          ),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(resultado['mensagem']),
-            backgroundColor: const Color.fromARGB(255, 14, 82, 109),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -93,8 +104,8 @@ Navigator.pushReplacement(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              const Color.fromARGB(225, 0, 48, 153),
-              const Color.fromARGB(255, 0, 0, 0),
+              Color(0xFF003099),
+              Color(0xFF000000),
             ],
           ),
         ),
@@ -132,7 +143,7 @@ Navigator.pushReplacement(
                       style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
-                        color: const Color.fromARGB(255, 254, 253, 255),
+                        color: Colors.white,
                       ),
                     ),
                     SizedBox(height: 10),
@@ -140,14 +151,14 @@ Navigator.pushReplacement(
                       'Encontre o melhor preço perto de você',
                       style: TextStyle(
                         fontSize: 16,
-                        color: const Color.fromARGB(179, 206, 191, 214),
+                        color: Colors.white70,
                       ),
                     ),
                     SizedBox(height: 50),
                     Container(
                       padding: EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 18, 15, 196),
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
@@ -170,7 +181,7 @@ Navigator.pushReplacement(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               filled: true,
-                              fillColor: const Color.fromARGB(255, 233, 233, 233),
+                              fillColor: Colors.grey.shade50,
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
@@ -231,7 +242,7 @@ Navigator.pushReplacement(
                               },
                               child: Text(
                                 'Esqueci minha senha',
-                                style: TextStyle(color: const Color.fromARGB(255, 188, 208, 228)),
+                                style: TextStyle(color: Colors.blue.shade700),
                               ),
                             ),
                           ),
@@ -242,7 +253,7 @@ Navigator.pushReplacement(
                             child: ElevatedButton(
                               onPressed: _carregando ? null : _fazerLogin,
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color.fromARGB(255, 21, 49, 206),
+                                backgroundColor: Colors.blue.shade700,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -354,7 +365,7 @@ class _TelaCadastroState extends State<TelaCadastro> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(resultado['mensagem']),
-            backgroundColor: const Color.fromARGB(255, 18, 55, 156),
+            backgroundColor: Colors.green,
           ),
         );
         Navigator.pop(context);
@@ -362,7 +373,7 @@ class _TelaCadastroState extends State<TelaCadastro> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(resultado['mensagem']),
-            backgroundColor: const Color.fromARGB(255, 228, 225, 225),
+            backgroundColor: Colors.red,
           ),
         );
       }
@@ -378,8 +389,8 @@ class _TelaCadastroState extends State<TelaCadastro> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              const Color.fromARGB(255, 0, 0, 0),
-              const Color.fromARGB(255, 4, 0, 238),
+              Color(0xFF000000),
+              Color(0xFF0400EE),
             ],
           ),
         ),
@@ -549,7 +560,7 @@ class _TelaCadastroState extends State<TelaCadastro> {
                           child: ElevatedButton(
                             onPressed: _carregando ? null : _cadastrar,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(255, 73, 4, 235),
+                              backgroundColor: Colors.blue.shade700,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),

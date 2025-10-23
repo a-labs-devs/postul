@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/posto.dart';
 import '../services/precos_service.dart';
+// TEMPORARIAMENTE DESABILITADO: import '../services/notificacao_proximidade_service.dart';
 
 class TelaAtualizarPreco extends StatefulWidget {
   final Posto posto;
@@ -61,7 +62,17 @@ class _TelaAtualizarPrecoState extends State<TelaAtualizarPreco> {
             backgroundColor: Colors.green,
           ),
         );
-        Navigator.pop(context, true); // Retorna true para recarregar
+        
+        // TEMPORARIAMENTE DESABILITADO: Notificações
+        /*
+        await NotificacaoProximidadeService.verificarAlteracaoPrecos(
+          posto: widget.posto,
+          combustivel: _tipoCombustivelSelecionado,
+        );
+        await NotificacaoProximidadeService.salvarPrecos();
+        */
+        
+        Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

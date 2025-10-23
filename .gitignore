@@ -1,0 +1,207 @@
+# ==================================
+# GITIGNORE - PROJETO POSTUL
+# ==================================
+
+# ============= GERAL =============
+# Arquivos do Sistema Operacional
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# IDEs e Editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ============= BACKEND (Node.js) =============
+# Dependencies
+backend/node_modules/
+node_modules/
+
+# Environment Variables (CRÍTICO - NÃO VERSIONAR)
+backend/.env
+backend/.env.local
+backend/.env.*.local
+.env
+.env.local
+.env.*.local
+
+# Chaves e Credenciais (CRÍTICO - NÃO VERSIONAR)
+backend/firebase-admin-key*.json
+backend/*-key.json
+backend/*.pem
+backend/*.key
+backend/*.cert
+**/firebase-admin-key*.json
+**/*-credentials.json
+**/*-service-account.json
+
+# Uploads (arquivos enviados pelos usuários)
+backend/uploads/**/*
+!backend/uploads/.gitkeep
+backend/uploads/fotos-postos/**/*
+!backend/uploads/fotos-postos/.gitkeep
+
+# Dados temporários
+backend/temp/
+backend/tmp/
+backend/*.csv
+backend/*.xlsx
+backend/precos_anp.csv
+
+# Coverage e testes
+backend/coverage/
+backend/.nyc_output/
+
+# Build
+backend/dist/
+backend/build/
+
+# ============= FRONTEND (Flutter) =============
+# Dart/Flutter
+app/.dart_tool/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/.packages
+app/.pub-cache/
+app/.pub/
+app/build/
+app/coverage/
+
+# Flutter generated files
+app/**/flutter_*.png
+app/**/GeneratedPluginRegistrant.*
+
+# Build artifacts
+app/**/build/
+app/**/.dart_tool/
+
+# Android
+app/android/app/debug
+app/android/app/profile
+app/android/app/release
+app/android/.gradle/
+app/android/gradle/
+app/android/.gradle
+app/android/captures/
+app/android/gradlew
+app/android/gradlew.bat
+app/android/local.properties
+app/android/key.properties
+app/android/**/*.jks
+app/android/**/*.keystore
+app/android/**/google-services.json
+app/android_old/**/google-services.json
+
+# iOS
+app/ios/Pods/
+app/ios/.symlinks/
+app/ios/Flutter/App.framework
+app/ios/Flutter/Flutter.framework
+app/ios/Flutter/Flutter.podspec
+app/ios/Flutter/Generated.xcconfig
+app/ios/Flutter/app.flx
+app/ios/Flutter/app.zip
+app/ios/Flutter/flutter_assets/
+app/ios/Flutter/flutter_export_environment.sh
+app/ios/ServiceDefinitions.json
+app/ios/Runner/GeneratedPluginRegistrant.*
+app/ios/**/*.mode1v3
+app/ios/**/*.mode2v3
+app/ios/**/*.moved-aside
+app/ios/**/*.pbxuser
+app/ios/**/*.perspectivev3
+app/ios/**/*sync/
+app/ios/.sconsign.dblite
+app/ios/.tags*
+
+# macOS
+app/macos/Flutter/GeneratedPluginRegistrant.swift
+app/macos/Flutter/Flutter-Debug.xcconfig
+app/macos/Flutter/Flutter-Release.xcconfig
+
+# Windows
+app/windows/flutter/generated_plugin_registrant.cc
+app/windows/flutter/generated_plugin_registrant.h
+app/windows/flutter/generated_plugins.cmake
+
+# Linux
+app/linux/flutter/generated_plugin_registrant.cc
+app/linux/flutter/generated_plugin_registrant.h
+app/linux/flutter/generated_plugins.cmake
+
+# Web
+app/web/.dart_tool/
+app/.firebase/
+app/.firebaserc
+
+# Symbolication & Obfuscation
+app/app.*.symbols
+app/app.*.map.json
+
+# IntelliJ/Android Studio
+app/**/*.iml
+app/**/*.ipr
+app/**/*.iws
+app/.idea/
+app/android/.idea/
+app/android_old/.idea/
+
+# Exceptions (arquivos que DEVEM ser versionados)
+!app/**/mock_data/**
+
+# ============= DOCKER =============
+# Volumes e dados persistentes
+.docker-data/
+docker-volumes/
+
+# ============= DATABASE =============
+# Dumps e backups locais
+*.sql
+*.sqlite
+*.db
+!schema.sql
+!migrations/*.sql
+
+# ============= TESTES =============
+# Coverage
+**/coverage/
+**/.nyc_output/
+**/test-results/
+**/.pytest_cache/
+
+# ============= BUILD GERAL =============
+build/
+dist/
+out/
+*.apk
+*.aab
+*.ipa
+*.app
+
+# ============= TEMPORÁRIOS =============
+*.tmp
+*.temp
+.cache/
+.temp/
+tmp/

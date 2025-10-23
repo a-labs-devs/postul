@@ -45,5 +45,94 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	
+	<!-- ============================================ -->
+	<!-- PERMISSÕES DE LOCALIZAÇÃO - GPS NAVIGATION -->
+	<!-- ============================================ -->
+	
+	<!-- Permissão de localização quando o app está em uso -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Precisamos da sua localização para mostrar postos de gasolina próximos e fornecer navegação GPS em tempo real.</string>
+	
+	<!-- Permissão de localização sempre (mesmo em background) -->
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Precisamos da sua localização para enviar notificações quando você passar perto de postos com bons preços.</string>
+	
+	<!-- Permissão combinada (iOS 11+) -->
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Precisamos da sua localização para mostrar postos próximos, fornecer navegação GPS e enviar alertas de preços.</string>
+	
+	<!-- Permissão temporária de localização precisa (iOS 14+) -->
+	<key>NSLocationTemporaryUsageDescriptionDictionary</key>
+	<dict>
+		<key>navigation</key>
+		<string>Localização precisa necessária para navegação GPS turn-by-turn</string>
+	</dict>
+	
+	<!-- ============================================ -->
+	<!-- PERMISSÕES DE VOZ E ÁUDIO - TTS -->
+	<!-- ============================================ -->
+	
+	<!-- Permissão para usar microfone (se necessário para reconhecimento de voz futuro) -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Usaremos o microfone para comandos de voz durante a navegação (opcional).</string>
+	
+	<!-- Permissão para Speech Recognition -->
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Permitir reconhecimento de voz para comandos durante navegação.</string>
+	
+	<!-- ============================================ -->
+	<!-- CONFIGURAÇÕES DE BACKGROUND -->
+	<!-- ============================================ -->
+	
+	<!-- Modos de background permitidos -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>fetch</string>
+		<string>remote-notification</string>
+		<string>audio</string>
+	</array>
+	
+	<!-- ============================================ -->
+	<!-- CONFIGURAÇÕES DE REDE -->
+	<!-- ============================================ -->
+	
+	<!-- Permitir tráfego HTTP não seguro (desenvolvimento) -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<!-- Para produção, use domínios específicos: -->
+		<!--
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>api.openrouteservice.org</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
+		-->
+	</dict>
+	
+	<!-- ============================================ -->
+	<!-- OUTRAS CONFIGURAÇÕES -->
+	<!-- ============================================ -->
+	
+	<!-- Permitir acesso à câmera (se adicionar foto de postos futuramente) -->
+	<key>NSCameraUsageDescription</key>
+	<string>Permitir tirar fotos dos postos de gasolina.</string>
+	
+	<!-- Permitir acesso à galeria de fotos -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Permitir adicionar fotos dos postos de gasolina.</string>
+	
+	<!-- Configurações de energia (manter navegação ativa) -->
+	<key>UIRequiresPersistentWiFi</key>
+	<false/>
+	
 </dict>
 </plist>
