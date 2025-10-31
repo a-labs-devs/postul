@@ -6,6 +6,7 @@ const router = express.Router();
 // Rotas existentes
 router.get('/listar', postosController.listarTodos);
 router.get('/proximos', postosController.buscarProximos);
+router.get('/area', postosController.buscarPorArea); // 🚀 NOVO: Busca otimizada por área
 router.post('/cadastrar', postosController.cadastrar);
 
 // NOVAS ROTAS

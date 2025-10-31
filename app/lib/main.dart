@@ -1,37 +1,74 @@
 import 'package:flutter/material.dart';
+import 'dart:async';
+import 'package:provider/provider.dart';
 import 'services/auth_service.dart';
 import 'screens/tela_mapa.dart';
 import 'models/usuario.dart';
+import 'theme/theme_provider.dart';
+import 'routes/routes.dart';
 // REMOVIDO: import 'package:firebase_core/firebase_core.dart';
 // TEMPORARIAMENTE DESABILITADO: import 'services/notificacao_proximidade_service.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  // Captura de erros global
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    print('╔══════════════════════════════════════════════════════════════');
+    print('║ 🚨 ERRO FLUTTER DETECTADO:');
+    print('║ ${details.exception}');
+    print('║ Stack Trace:');
+    print('║ ${details.stack}');
+    print('╚══════════════════════════════════════════════════════════════');
+  };
 
-  // REMOVIDO: Firebase (você não precisa dele para notificações locais)
-  // await Firebase.initializeApp();
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  // TEMPORARIAMENTE DESABILITADO: Inicializar serviço de notificações locais
-  // await NotificacaoProximidadeService.inicializar();
+    // REMOVIDO: Firebase (você não precisa dele para notificações locais)
+    // await Firebase.initializeApp();
 
-  runApp(AppPostosGasolina());
+    // TEMPORARIAMENTE DESABILITADO: Inicializar serviço de notificações locais
+    // await NotificacaoProximidadeService.inicializar();
+
+    runApp(
+      ChangeNotifierProvider(
+        create: (_) => ThemeProvider(),
+        child: const AppPostosGasolina(),
+      ),
+    );
+  }, (error, stackTrace) {
+    print('╔══════════════════════════════════════════════════════════════');
+    print('║ 🚨 ERRO NÃO CAPTURADO:');
+    print('║ $error');
+    print('║ Stack Trace:');
+    print('║ $stackTrace');
+    print('╚══════════════════════════════════════════════════════════════');
+  });
 }
 
 class AppPostosGasolina extends StatelessWidget {
+  const AppPostosGasolina({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Postul',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: TelaLogin(),
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, child) {
+        return MaterialApp(
+          title: 'Postul',
+          debugShowCheckedModeBanner: false,
+          theme: themeProvider.lightTheme,
+          darkTheme: themeProvider.darkTheme,
+          themeMode: themeProvider.themeMode,
+          // Nova navegação com rotas nomeadas
+          initialRoute: AppRoutes.login,
+          onGenerateRoute: AppRouter.generateRoute,
+        );
+      },
     );
   }
 }
 
+// ========== TELA ANTIGA - MANTER PARA COMPATIBILIDADE ==========
 class TelaLogin extends StatefulWidget {
   @override
   _TelaLoginState createState() => _TelaLoginState();

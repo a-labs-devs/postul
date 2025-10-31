@@ -22,27 +22,40 @@ class Posto {
   });
 
   factory Posto.fromJson(Map<String, dynamic> json) {
-    List<Preco>? precosList;
-    if (json['precos'] != null && json['precos'] is List) {
-      precosList = (json['precos'] as List)
-          .where((p) => p != null)
-          .map((p) => Preco.fromJson(p))
-          .toList();
-    }
+    try {
+      print('🔍 Parsing posto JSON: $json');
+      
+      List<Preco>? precosList;
+      if (json['precos'] != null && json['precos'] is List) {
+        precosList = (json['precos'] as List)
+            .where((p) => p != null)
+            .map((p) => Preco.fromJson(p))
+            .toList();
+      }
 
-    return Posto(
-      id: json['id'],
-      nome: json['nome'],
-      endereco: json['endereco'],
-      latitude: double.parse(json['latitude'].toString()),
-      longitude: double.parse(json['longitude'].toString()),
-      telefone: json['telefone'],
-      aberto24h: json['aberto_24h'] ?? false,
-      precos: precosList,
-      distancia: json['distancia'] != null 
-          ? double.parse(json['distancia'].toString()) 
-          : null,
-    );
+      final posto = Posto(
+        id: json['id'] ?? 0,
+        nome: json['nome']?.toString() ?? 'Posto sem nome',
+        endereco: json['endereco']?.toString() ?? 'Endereço não informado',
+        latitude: double.tryParse(json['latitude']?.toString() ?? '0') ?? 0.0,
+        longitude: double.tryParse(json['longitude']?.toString() ?? '0') ?? 0.0,
+        telefone: json['telefone']?.toString().isEmpty ?? true ? null : json['telefone']?.toString(),
+        aberto24h: json['aberto_24h'] == true || json['aberto_24h'] == 1,
+        precos: precosList,
+        distancia: json['distancia'] != null 
+            ? double.tryParse(json['distancia'].toString()) 
+            : null,
+      );
+      
+      print('✅ Posto parsed: ${posto.nome}');
+      return posto;
+    } catch (e, stackTrace) {
+      print('❌ ERRO ao fazer parse de Posto:');
+      print('JSON: $json');
+      print('Erro: $e');
+      print('Stack: $stackTrace');
+      rethrow;
+    }
   }
 
   // Encontrar menor preço de um tipo de combustível
@@ -81,15 +94,23 @@ class Preco {
   });
 
   factory Preco.fromJson(Map<String, dynamic> json) {
-    return Preco(
-      id: json['id'],
-      postoId: json['posto_id'],
-      tipo: json['tipo_combustivel'] ?? json['tipo'] ?? '',
-      preco: double.parse(json['preco'].toString()),
-      atualizadoEm: DateTime.parse(json['data_atualizacao'] ?? json['atualizado_em']),
-      usuarioId: json['usuario_id'],
-      usuarioNome: json['usuario_nome'],
-    );
+    try {
+      return Preco(
+        id: json['id'],
+        postoId: json['posto_id'],
+        tipo: (json['tipo_combustivel'] ?? json['tipo'] ?? 'Não informado').toString(),
+        preco: double.tryParse(json['preco']?.toString() ?? '0') ?? 0.0,
+        atualizadoEm: json['data_atualizacao'] != null || json['atualizado_em'] != null
+            ? DateTime.tryParse(json['data_atualizacao'] ?? json['atualizado_em']) ?? DateTime.now()
+            : DateTime.now(),
+        usuarioId: json['usuario_id'],
+        usuarioNome: json['usuario_nome']?.toString(),
+      );
+    } catch (e) {
+      print('❌ Erro ao fazer parse de Preco: $json');
+      print('Erro: $e');
+      rethrow;
+    }
   }
 
   Map<String, dynamic> toJson() {

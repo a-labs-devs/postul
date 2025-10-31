@@ -96,6 +96,62 @@ const postosController = {
     }
   },
 
+  // 🚀 NOVO: Buscar postos por área (bounding box) - OTIMIZADO
+  buscarPorArea: async (req, res) => {
+    const { latMin, latMax, lngMin, lngMax, limit } = req.query;
+
+    if (!latMin || !latMax || !lngMin || !lngMax) {
+      return res.status(400).json({
+        sucesso: false,
+        mensagem: 'Coordenadas da área são obrigatórias (latMin, latMax, lngMin, lngMax)'
+      });
+    }
+
+    const limitePostos = parseInt(limit) || 100; // Máximo 100 postos por requisição
+
+    try {
+      // Busca otimizada usando índice de coordenadas
+      const resultado = await pool.query(`
+        SELECT 
+          p.id,
+          COALESCE(p.nome, 'Posto sem nome') as nome,
+          COALESCE(p.endereco, 'Endereço não informado') as endereco,
+          COALESCE(p.latitude::text, '0')::numeric as latitude,
+          COALESCE(p.longitude::text, '0')::numeric as longitude,
+          COALESCE(p.telefone, '') as telefone,
+          COALESCE(p.aberto_24h, false) as aberto_24h,
+          COALESCE(
+            json_agg(
+              json_build_object(
+                'tipo', COALESCE(pc.tipo_combustivel, ''),
+                'preco', COALESCE(pc.preco, 0)
+              )
+            ) FILTER (WHERE pc.id IS NOT NULL),
+            '[]'::json
+          ) as precos
+        FROM postos p
+        LEFT JOIN precos_combustivel pc ON p.id = pc.posto_id
+        WHERE p.latitude BETWEEN $1 AND $2
+          AND p.longitude BETWEEN $3 AND $4
+          AND p.id IS NOT NULL
+        GROUP BY p.id, p.nome, p.endereco, p.latitude, p.longitude, p.telefone, p.aberto_24h
+        LIMIT $5
+      `, [latMin, latMax, lngMin, lngMax, limitePostos]);
+
+      res.json({
+        sucesso: true,
+        total: resultado.rows.length,
+        postos: resultado.rows
+      });
+    } catch (error) {
+      console.error('Erro ao buscar postos por área:', error);
+      res.status(500).json({
+        sucesso: false,
+        mensagem: 'Erro ao buscar postos por área'
+      });
+    }
+  },
+
   // Buscar posto por ID (NOVO)
   buscarPorId: async (req, res) => {
     const { id } = req.params;

@@ -79,12 +79,43 @@ const createTables = async () => {
     );
   `;
 
-  // Índices para melhor performance
+  // NOVA: Tabela de códigos de recuperação de senha
+  const createCodigosRecuperacaoTable = `
+    CREATE TABLE IF NOT EXISTS codigos_recuperacao (
+      id SERIAL PRIMARY KEY,
+      email VARCHAR(255) NOT NULL,
+      codigo VARCHAR(6) NOT NULL,
+      expira_em TIMESTAMP NOT NULL,
+      usado BOOLEAN DEFAULT false,
+      usado_em TIMESTAMP,
+      criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+
+  // Índices para melhor performance (OTIMIZADO)
   const createIndexes = `
+    -- Índices para postos (busca geográfica otimizada)
+    CREATE INDEX IF NOT EXISTS idx_postos_latitude ON postos(latitude);
+    CREATE INDEX IF NOT EXISTS idx_postos_longitude ON postos(longitude);
+    CREATE INDEX IF NOT EXISTS idx_postos_lat_lng ON postos(latitude, longitude);
+    
+    -- Índices para preços
+    CREATE INDEX IF NOT EXISTS idx_precos_posto ON precos_combustivel(posto_id);
+    CREATE INDEX IF NOT EXISTS idx_precos_tipo ON precos_combustivel(tipo_combustivel);
+    CREATE INDEX IF NOT EXISTS idx_precos_data ON precos_combustivel(data_atualizacao DESC);
+    
+    -- Índices para favoritos
     CREATE INDEX IF NOT EXISTS idx_favoritos_usuario ON favoritos(usuario_id);
     CREATE INDEX IF NOT EXISTS idx_favoritos_posto ON favoritos(posto_id);
+    
+    -- Índices para histórico
     CREATE INDEX IF NOT EXISTS idx_historico_posto_combustivel ON historico_precos(posto_id, tipo_combustivel);
     CREATE INDEX IF NOT EXISTS idx_historico_data ON historico_precos(registrado_em DESC);
+    
+    -- Índices para recuperação de senha
+    CREATE INDEX IF NOT EXISTS idx_recuperacao_email ON codigos_recuperacao(email);
+    CREATE INDEX IF NOT EXISTS idx_recuperacao_codigo ON codigos_recuperacao(codigo);
+    CREATE INDEX IF NOT EXISTS idx_recuperacao_expira ON codigos_recuperacao(expira_em);
   `;
 
   // Função para registrar histórico automaticamente
@@ -149,6 +180,10 @@ const createTables = async () => {
     await pool.query(createHistoricoTable);
     console.log('  ✅ Tabela historico_precos');
     
+    // Tabela de recuperação de senha
+    await pool.query(createCodigosRecuperacaoTable);
+    console.log('  ✅ Tabela codigos_recuperacao');
+    
     // Índices
     await pool.query(createIndexes);
     console.log('  ✅ Índices criados');
@@ -167,6 +202,7 @@ const createTables = async () => {
     console.log('  • precos_combustivel');
     console.log('  • favoritos (NOVO)');
     console.log('  • historico_precos (NOVO)');
+    console.log('  • codigos_recuperacao (NOVO)');
     
   } catch (error) {
     console.error('❌ Erro ao criar tabelas:', error);

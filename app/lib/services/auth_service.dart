@@ -108,4 +108,153 @@ class AuthService {
     final token = await obterToken();
     return token != null;
   }
+
+  // Verificar se token é válido
+  Future<Map<String, dynamic>> verificarToken() async {
+    try {
+      final token = await obterToken();
+
+      if (token == null) {
+        return {
+          'sucesso': false,
+          'mensagem': 'Token não encontrado',
+        };
+      }
+
+      final response = await http.get(
+        Uri.parse('$baseUrl/verificar'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'sucesso': true,
+          'usuario': data['usuario'],
+        };
+      } else {
+        return {
+          'sucesso': false,
+          'mensagem': data['mensagem'] ?? 'Token inválido',
+        };
+      }
+    } catch (e) {
+      return {
+        'sucesso': false,
+        'mensagem': 'Erro de conexão: $e',
+      };
+    }
+  }
+
+  // 🔑 Solicitar recuperação de senha
+  Future<Map<String, dynamic>> solicitarRecuperacao({
+    required String email,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/solicitar-recuperacao'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email,
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'sucesso': true,
+          'mensagem': data['mensagem'],
+        };
+      } else {
+        return {
+          'sucesso': false,
+          'mensagem': data['mensagem'] ?? 'Erro ao solicitar recuperação',
+        };
+      }
+    } catch (e) {
+      return {
+        'sucesso': false,
+        'mensagem': 'Erro de conexão: $e',
+      };
+    }
+  }
+
+  // 🔑 Validar código de recuperação
+  Future<Map<String, dynamic>> validarCodigo({
+    required String email,
+    required String codigo,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/validar-codigo'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email,
+          'codigo': codigo,
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'sucesso': true,
+          'mensagem': data['mensagem'],
+        };
+      } else {
+        return {
+          'sucesso': false,
+          'mensagem': data['mensagem'] ?? 'Código inválido',
+        };
+      }
+    } catch (e) {
+      return {
+        'sucesso': false,
+        'mensagem': 'Erro de conexão: $e',
+      };
+    }
+  }
+
+  // 🔑 Redefinir senha
+  Future<Map<String, dynamic>> redefinirSenha({
+    required String email,
+    required String codigo,
+    required String novaSenha,
+  }) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/redefinir-senha'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email,
+          'codigo': codigo,
+          'novaSenha': novaSenha,
+        }),
+      );
+
+      final data = jsonDecode(response.body);
+
+      if (response.statusCode == 200) {
+        return {
+          'sucesso': true,
+          'mensagem': data['mensagem'],
+        };
+      } else {
+        return {
+          'sucesso': false,
+          'mensagem': data['mensagem'] ?? 'Erro ao redefinir senha',
+        };
+      }
+    } catch (e) {
+      return {
+        'sucesso': false,
+        'mensagem': 'Erro de conexão: $e',
+      };
+    }
+  }
 }

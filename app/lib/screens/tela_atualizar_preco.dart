@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
 import '../models/posto.dart';
 import '../services/precos_service.dart';
-// TEMPORARIAMENTE DESABILITADO: import '../services/notificacao_proximidade_service.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_typography.dart';
+import '../theme/app_spacing.dart';
+import '../theme/app_radius.dart';
+import '../widgets/buttons/primary_button.dart';
+import '../widgets/inputs/custom_dropdown.dart';
+import '../widgets/modals/custom_snackbar.dart';
 
 class TelaAtualizarPreco extends StatefulWidget {
   final Posto posto;
   final int usuarioId;
 
-  TelaAtualizarPreco({required this.posto, required this.usuarioId});
+  const TelaAtualizarPreco({
+    super.key,
+    required this.posto,
+    required this.usuarioId,
+  });
 
   @override
   _TelaAtualizarPrecoState createState() => _TelaAtualizarPrecoState();
@@ -56,29 +66,22 @@ class _TelaAtualizarPrecoState extends State<TelaAtualizarPreco> {
       });
 
       if (resultado['sucesso']) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(resultado['mensagem']),
-            backgroundColor: Colors.green,
-          ),
-        );
+        if (!mounted) return;
         
-        // TEMPORARIAMENTE DESABILITADO: Notificações
-        /*
-        await NotificacaoProximidadeService.verificarAlteracaoPrecos(
-          posto: widget.posto,
-          combustivel: _tipoCombustivelSelecionado,
+        CustomSnackbar.show(
+          context,
+          message: resultado['mensagem'],
+          type: SnackbarType.success,
         );
-        await NotificacaoProximidadeService.salvarPrecos();
-        */
         
         Navigator.pop(context, true);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(resultado['mensagem']),
-            backgroundColor: Colors.red,
-          ),
+        if (!mounted) return;
+        
+        CustomSnackbar.show(
+          context,
+          message: resultado['mensagem'],
+          type: SnackbarType.error,
         );
       }
     }
@@ -87,46 +90,74 @@ class _TelaAtualizarPrecoState extends State<TelaAtualizarPreco> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('Atualizar Preço'),
-        backgroundColor: Colors.blue,
+        backgroundColor: AppColors.primary,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Atualizar Preço',
+          style: AppTypography.headlineMedium.copyWith(color: Colors.white),
+        ),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(24),
+        padding: EdgeInsets.all(AppSpacing.space24),
         child: Form(
           key: _formKey,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              // Card do Posto
               Container(
-                padding: EdgeInsets.all(16),
+                padding: EdgeInsets.all(AppSpacing.space16),
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.blue.shade200),
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.local_gas_station, color: Colors.blue, size: 30),
-                    SizedBox(width: 12),
+                    Container(
+                      padding: EdgeInsets.all(AppSpacing.space12),
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryLight,
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
+                      ),
+                      child: Icon(
+                        Icons.local_gas_station,
+                        color: AppColors.primary,
+                        size: 32,
+                      ),
+                    ),
+                    SizedBox(width: AppSpacing.space16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             widget.posto.nome,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                            style: AppTypography.titleMedium,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          SizedBox(height: 4),
+                          SizedBox(height: AppSpacing.space4),
                           Text(
                             widget.posto.endereco,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey.shade700,
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.textSecondary,
                             ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
@@ -134,25 +165,21 @@ class _TelaAtualizarPrecoState extends State<TelaAtualizarPreco> {
                   ],
                 ),
               ),
-              SizedBox(height: 30),
+              
+              SizedBox(height: AppSpacing.space32),
+              
+              // Título da Seção
               Text(
-                'Tipo de Combustível',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+                'Informações do Combustível',
+                style: AppTypography.titleLarge,
               ),
-              SizedBox(height: 10),
-              DropdownButtonFormField<String>(
+              SizedBox(height: AppSpacing.space16),
+              
+              // Dropdown de Tipo de Combustível
+              CustomDropdown<String>(
                 value: _tipoCombustivelSelecionado,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey.shade50,
-                  prefixIcon: Icon(Icons.local_gas_station),
-                ),
+                label: 'Tipo de Combustível',
+                prefixIcon: Icons.local_gas_station,
                 items: _tiposCombustivel.map((tipo) {
                   return DropdownMenuItem(
                     value: tipo,
@@ -165,26 +192,39 @@ class _TelaAtualizarPrecoState extends State<TelaAtualizarPreco> {
                   });
                 },
               ),
-              SizedBox(height: 20),
-              Text(
-                'Preço (R\$)',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 10),
+              
+              SizedBox(height: AppSpacing.space20),
+              
+              // Campo de Preço
               TextFormField(
                 controller: _precoController,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                style: AppTypography.bodyLarge,
                 decoration: InputDecoration(
+                  labelText: 'Preço (R\$)',
                   hintText: 'Ex: 5.89',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                  labelStyle: AppTypography.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
                   ),
                   filled: true,
-                  fillColor: Colors.grey.shade50,
-                  prefixIcon: Icon(Icons.attach_money),
+                  fillColor: AppColors.surfaceVariant,
+                  prefixIcon: const Icon(
+                    Icons.attach_money,
+                    size: 20,
+                    color: AppColors.textSecondary,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    borderSide: BorderSide(color: AppColors.primary, width: 2),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    borderSide: const BorderSide(color: AppColors.error, width: 1),
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -194,39 +234,63 @@ class _TelaAtualizarPrecoState extends State<TelaAtualizarPreco> {
                   if (preco == null || preco <= 0) {
                     return 'Preço inválido';
                   }
+                  if (preco > 50) {
+                    return 'Preço muito alto. Verifique o valor.';
+                  }
                   return null;
                 },
               ),
-              SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  onPressed: _carregando ? null : _atualizarPreco,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              
+              SizedBox(height: AppSpacing.space16),
+              
+              // Informação Adicional
+              Container(
+                padding: EdgeInsets.all(AppSpacing.space16),
+                decoration: BoxDecoration(
+                  color: AppColors.success.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                  border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.info_outline,
+                      color: AppColors.success,
+                      size: 20,
                     ),
-                    elevation: 5,
-                  ),
-                  child: _carregando
-                      ? SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : Text(
-                          'Atualizar Preço',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                    SizedBox(width: AppSpacing.space12),
+                    Expanded(
+                      child: Text(
+                        'Ao atualizar, você estará contribuindo com a comunidade. Obrigado!',
+                        style: AppTypography.labelSmall.copyWith(
+                          color: AppColors.success,
                         ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+              SizedBox(height: AppSpacing.space32),
+              
+              // Botão de Atualizar
+              PrimaryButton(
+                label: 'Atualizar Preço',
+                onPressed: _carregando ? null : _atualizarPreco,
+                isLoading: _carregando,
+                icon: Icons.upload,
+              ),
+              
+              SizedBox(height: AppSpacing.space16),
+              
+              // Texto de Rodapé
+              Center(
+                child: Text(
+                  'Última atualização será registrada em seu nome',
+                  style: AppTypography.labelSmall.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
             ],
