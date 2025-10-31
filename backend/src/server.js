@@ -13,7 +13,7 @@ const avaliacoesRoutes = require('./routes/avaliacoesRoutes');
 const fotosRoutes = require('./routes/fotosRoutes');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = 3001;
 
 // Middleware de compressão GZIP (deve vir antes das rotas)
 app.use(compression());
