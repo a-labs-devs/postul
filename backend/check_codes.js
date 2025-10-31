@@ -4,7 +4,7 @@ const pool = new Pool({
   user: 'admin',
   host: 'localhost',
   database: 'postos_db',
-  password: 'admin123',
+  password: '7171FIEAvwU0',
   port: 5432
 });
 

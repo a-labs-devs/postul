@@ -8,7 +8,7 @@ const CONFIG = {
     host: 'localhost',
     port: 5432,
     user: 'admin',
-    password: 'admin123',
+    password: '7171FIEAvwU0',
     database: 'postos_db'
   },
   
