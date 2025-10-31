@@ -39,9 +39,11 @@ echo OK - Dependencias atualizadas
 echo [3/3] Reiniciando servico...
 echo.
 
-echo Parando processo Node.js anterior...
-taskkill /F /IM node.exe >nul 2>&1
-taskkill /F /IM nodemon.exe >nul 2>&1
+echo Parando servidor backend anterior (porta 3001)...
+REM Matar apenas processos na porta 3001 (backend) sem afetar webhook (3002)
+FOR /F "tokens=5" %%P IN ('netstat -ano ^| findstr :3001') DO (
+    taskkill /F /PID %%P >nul 2>&1
+)
 
 echo Aguardando liberacao da porta...
 timeout /t 2 /nobreak >nul

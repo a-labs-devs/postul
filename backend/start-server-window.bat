@@ -5,9 +5,12 @@ REM ============================================
 
 cd /d "%~dp0"
 
-REM Matar processos anteriores
-taskkill /F /IM node.exe >nul 2>&1
-taskkill /F /IM nodemon.exe >nul 2>&1
+REM Matar apenas processos Node do backend (porta 3001)
+echo Parando servidor backend anterior...
+FOR /F "tokens=5" %%P IN ('netstat -ano ^| findstr :3001') DO (
+    taskkill /F /PID %%P >nul 2>&1
+)
+
 timeout /t 2 /nobreak >nul
 
 REM Iniciar servidor em nova janela VISÍVEL
