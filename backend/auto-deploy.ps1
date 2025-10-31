@@ -29,11 +29,6 @@ npm run dev
 
 Set-Content -Path $tempScript -Value $scriptContent -Force
 
-# 3. Criar tarefa agendada temporária para executar com interface gráfica
-$taskName = "PostulDeploy_$(Get-Date -Format 'HHmmss')"
-$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoExit -ExecutionPolicy Bypass -File `"$tempScript`""
-$principal = New-ScheduledTaskPrincipal -UserId "$env:USERNAME" -LogonType Interactive
-Register-ScheduledTask -TaskName $taskName -Action $action -Principal $principal -Force | Out-Null
-Start-ScheduledTask -TaskName $taskName
-Start-Sleep -Seconds 2
-Unregister-ScheduledTask -TaskName $taskName -Confirm:$false
+# 3. Usar VBScript para abrir terminal (funciona mesmo via webhook)
+$vbsLauncher = "$PSScriptRoot\launch-terminal.vbs"
+Start-Process -FilePath "wscript.exe" -ArgumentList "`"$vbsLauncher`"", "`"$tempScript`"" -WindowStyle Hidden
