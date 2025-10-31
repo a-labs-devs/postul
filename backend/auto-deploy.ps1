@@ -1,13 +1,7 @@
 # Auto-Deploy - Executado pelo Webhook
 Set-Location $PSScriptRoot
 
-# 1. Git pull
-git pull origin main 2>&1 | Out-Null
-
-# 2. NPM install
-npm install --silent 2>&1 | Out-Null
-
-# 3. Fechar terminal anterior (porta 3001)
+# 1. Fechar terminal anterior (porta 3001)
 $connections = netstat -ano | Select-String ":3001"
 if ($connections) {
     $connections | ForEach-Object {
@@ -17,9 +11,19 @@ if ($connections) {
             Stop-Process -Id $pid -Force -ErrorAction SilentlyContinue
         }
     }
+    Start-Sleep -Seconds 2
 }
 
-Start-Sleep -Seconds 1
+# 2. Abrir novo terminal PowerShell que faz pull, install e roda servidor
+$commands = @"
+cd '$PSScriptRoot'
+Write-Host '=== Auto-Deploy ===' -ForegroundColor Cyan
+Write-Host '[1/3] Git pull...' -ForegroundColor Yellow
+git pull origin main
+Write-Host '[2/3] NPM install...' -ForegroundColor Yellow
+npm install --silent
+Write-Host '[3/3] Iniciando servidor...' -ForegroundColor Green
+npm run dev
+"@
 
-# 4. Abrir novo terminal PowerShell com servidor
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$PSScriptRoot'; npm run dev"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", $commands
