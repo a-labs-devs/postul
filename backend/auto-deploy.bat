@@ -42,12 +42,13 @@ echo.
 echo Parando processo Node.js anterior...
 taskkill /F /IM node.exe >nul 2>&1
 taskkill /F /IM nodemon.exe >nul 2>&1
-timeout /t 3 /nobreak >nul
+
+echo Aguardando liberacao da porta...
+timeout /t 2 /nobreak >nul
 
 echo Iniciando servidor em nova janela...
-REM Usar PowerShell para garantir que a janela seja criada no desktop do usuário
-powershell -Command "Start-Process cmd -ArgumentList '/k','cd','/d','%~dp0','&&','npm','run','dev' -WindowStyle Normal"
-timeout /t 2 /nobreak >nul
+REM Usar START com /B para não bloquear e criar janela separada
+start "Postul Backend" cmd /k "%~dp0start-after-deploy.bat"
 
 echo.
 echo ============================================
