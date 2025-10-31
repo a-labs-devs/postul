@@ -17,4 +17,6 @@ REM Iniciar servidor em nova janela VISÍVEL
 start "Postul Backend - %date% %time%" cmd /k "npm run dev"
 
 echo Servidor iniciado em nova janela
-exit /b 0
+
+REM Fechar este terminal
+exit

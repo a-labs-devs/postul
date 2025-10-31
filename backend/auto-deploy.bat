@@ -50,7 +50,8 @@ timeout /t 2 /nobreak >nul
 
 echo Iniciando servidor em nova janela...
 REM Usar VBScript para garantir janela visível no desktop interativo
-cscript //nologo "%~dp0launch-visible-window.vbs" "%~dp0"
+REM Passa o argumento /close para indicar que o terminal de deploy pode fechar
+cscript //nologo "%~dp0launch-visible-window.vbs" "%~dp0" "/close"
 
 echo.
 echo ============================================
