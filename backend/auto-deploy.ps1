@@ -14,9 +14,10 @@ if ($connections) {
     Start-Sleep -Seconds 2
 }
 
-# 2. Abrir novo terminal PowerShell que faz pull, install e roda servidor
-$commands = @"
-cd '$PSScriptRoot'
+# 2. Criar script temporário
+$tempScript = "$PSScriptRoot\temp-deploy.ps1"
+$scriptContent = @"
+Set-Location '$PSScriptRoot'
 Write-Host '=== Auto-Deploy ===' -ForegroundColor Cyan
 Write-Host '[1/3] Git pull...' -ForegroundColor Yellow
 git pull origin main
@@ -26,4 +27,13 @@ Write-Host '[3/3] Iniciando servidor...' -ForegroundColor Green
 npm run dev
 "@
 
-Start-Process powershell -ArgumentList "-NoExit", "-Command", $commands
+Set-Content -Path $tempScript -Value $scriptContent -Force
+
+# 3. Criar tarefa agendada temporária para executar com interface gráfica
+$taskName = "PostulDeploy_$(Get-Date -Format 'HHmmss')"
+$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoExit -ExecutionPolicy Bypass -File `"$tempScript`""
+$principal = New-ScheduledTaskPrincipal -UserId "$env:USERNAME" -LogonType Interactive
+Register-ScheduledTask -TaskName $taskName -Action $action -Principal $principal -Force | Out-Null
+Start-ScheduledTask -TaskName $taskName
+Start-Sleep -Seconds 2
+Unregister-ScheduledTask -TaskName $taskName -Confirm:$false
