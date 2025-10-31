@@ -11,6 +11,7 @@ const importarPostosRoutes = require('./routes/importarPostosRoutes');
 const favoritosRoutes = require('./routes/favoritosRoutes');
 const avaliacoesRoutes = require('./routes/avaliacoesRoutes');
 const fotosRoutes = require('./routes/fotosRoutes');
+const webhookRoutes = require('./routes/webhookRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -32,6 +33,7 @@ app.use('/api/importar', importarPostosRoutes);
 app.use('/api/favoritos', favoritosRoutes);
 app.use('/api/avaliacoes', avaliacoesRoutes);
 app.use('/api/fotos', fotosRoutes);
+app.use('/webhook', webhookRoutes);
 
 // Rota principal
 app.get('/', (req, res) => {
