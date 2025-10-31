@@ -1,5 +1,5 @@
 const { Pool } = require('pg');
-require('dotenv').config();
+// dotenv já é carregado no server.js principal
 
 const pool = new Pool({
   host: process.env.DB_HOST,
