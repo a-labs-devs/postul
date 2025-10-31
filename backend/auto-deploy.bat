@@ -47,8 +47,8 @@ echo Aguardando liberacao da porta...
 timeout /t 2 /nobreak >nul
 
 echo Iniciando servidor em nova janela...
-REM Usar START com /B para não bloquear e criar janela separada
-start "Postul Backend" cmd /k "%~dp0start-after-deploy.bat"
+REM Usar VBScript para garantir janela visível no desktop interativo
+cscript //nologo "%~dp0launch-visible-window.vbs" "%~dp0"
 
 echo.
 echo ============================================
