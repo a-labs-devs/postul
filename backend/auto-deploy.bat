@@ -41,10 +41,13 @@ echo.
 
 echo Parando processo Node.js anterior...
 taskkill /F /IM node.exe >nul 2>&1
-timeout /t 2 /nobreak >nul
+taskkill /F /IM nodemon.exe >nul 2>&1
+timeout /t 3 /nobreak >nul
 
 echo Iniciando servidor em nova janela...
-start "Postul Backend - Deploy %date% %time%" cmd /k "cd /d "%~dp0" && npm run dev"
+REM Usar PowerShell para garantir que a janela seja criada no desktop do usuário
+powershell -Command "Start-Process cmd -ArgumentList '/k','cd','/d','%~dp0','&&','npm','run','dev' -WindowStyle Normal"
+timeout /t 2 /nobreak >nul
 
 echo.
 echo ============================================
