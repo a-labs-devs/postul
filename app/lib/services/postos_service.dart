@@ -4,7 +4,7 @@ import '../models/posto.dart';
 import 'cache_service.dart';
 
 class PostosService {
-  static const String baseUrl = 'https://guestless-jinny-parsable.ngrok-free.dev/api/postos';
+  static const String baseUrl = 'http://alabsv.ddns.net:3001/api/postos';
   final CacheService _cacheService = CacheService();
 
   // Listar todos os postos COM CACHE

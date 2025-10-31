@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import '../models/favorito.dart';
 
 class FavoritosService {
-  static const String baseUrl = 'https://guestless-jinny-parsable.ngrok-free.dev/api/favoritos';
+  static const String baseUrl = 'http://alabsv.ddns.net:3001/api/favoritos';
 
   // Listar favoritos do usuário
   Future<List<Favorito>> listar(int usuarioId) async {

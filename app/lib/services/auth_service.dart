@@ -5,7 +5,7 @@ import '../models/usuario.dart';
 
 class AuthService {
   // IMPORTANTE: Use o IP da sua máquina aqui
-  static const String baseUrl = 'https://guestless-jinny-parsable.ngrok-free.dev/api/auth';
+  static const String baseUrl = 'http://alabsv.ddns.net:3001/api/auth';
   Future<Map<String, dynamic>> cadastrar({
     required String nome,
     required String email,
