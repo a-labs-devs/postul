@@ -6,7 +6,7 @@ services:
     container_name: postgres-postos
     environment:
       POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin123
+      POSTGRES_PASSWORD: 7171FIEAvwU0
       POSTGRES_DB: postos_db
     ports:
       - "5432:5432"

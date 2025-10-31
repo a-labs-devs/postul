@@ -205,3 +205,4 @@ out/
 .cache/
 .temp/
 tmp/
+backend/.env
