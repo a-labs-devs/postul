@@ -12,6 +12,9 @@ const favoritosRoutes = require('./routes/favoritosRoutes');
 const avaliacoesRoutes = require('./routes/avaliacoesRoutes');
 const fotosRoutes = require('./routes/fotosRoutes');
 
+// 🤖 Serviço de auto-importação
+const autoImportService = require('./services/autoImportService');
+
 const app = express();
 const PORT = 3001;
 
@@ -50,7 +53,7 @@ app.get('/', (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
   console.log(`📍 http://localhost:${PORT}`);
   console.log(`\n✅ Endpoints disponíveis:`);
@@ -62,6 +65,13 @@ app.listen(PORT, () => {
   console.log(`  • /api/favoritos - Favoritos do usuário`);
   console.log(`  • /api/avaliacoes - Avaliações dos postos`);
   console.log(`  • /api/fotos - Upload e fotos dos postos`);
+  
+  // 🤖 Executar auto-importação de postos (apenas se banco estiver vazio)
+  try {
+    await autoImportService.executarImportacaoAutomatica();
+  } catch (error) {
+    console.error('⚠️  Erro na auto-importação (não crítico):', error.message);
+  }
 });
 
 module.exports = app;
