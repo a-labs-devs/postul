@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as google_maps;
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 import '../../models/posto.dart';
@@ -60,6 +62,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   bool _isMapReady = false;
   bool _isUsingDeadReckoning = false; // Indicador de GPS fraco
   bool _voiceEnabled = true; // Controle de voz ativado por padrão
+  bool _arrivedDialogShown = false; // Controla se já mostrou o diálogo de chegada
 
   double get _progress => _currentStep / _totalSteps;
 
@@ -187,6 +190,12 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
     // Anunciar instrução de voz
     _announceNavigation(distanceInMeters);
+    
+    // 🎯 Verificar se chegou ao destino (menos de 50 metros)
+    if (distanceInMeters < 50 && !_arrivedDialogShown) {
+      _arrivedDialogShown = true;
+      _mostrarDialogoChegada();
+    }
   }
 
   // 🔊 Anunciar instrução de navegação por voz
@@ -977,5 +986,212 @@ class _NavigationScreenState extends State<NavigationScreen> {
       return true;
     }
     return false;
+  }
+
+  /// 🎯 Diálogo de chegada ao destino
+  void _mostrarDialogoChegada() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        icon: Icon(Icons.check_circle, color: AppColors.success, size: 64),
+        title: const Text("Você chegou ao seu destino!"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "Parabéns! Você completou a navegação.",
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              widget.posto.nome,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+        actions: [
+          PrimaryButton(
+            label: "OK",
+            onPressed: () {
+              Navigator.pop(context); // Fecha o diálogo
+              _mostrarDialogoVerificarPreco(); // Abre diálogo de verificação de preço
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// 💰 Diálogo para verificar e atualizar preço
+  void _mostrarDialogoVerificarPreco() {
+    final TextEditingController precoController = TextEditingController();
+    bool precoCorreto = false;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          icon: Icon(Icons.local_gas_station, color: AppColors.primary, size: 48),
+          title: const Text("Verificação de Preço"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "O preço do combustível estava correto?",
+                style: TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 20),
+              
+              // Botões Sim/Não
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        precoCorreto = true;
+                      });
+                    },
+                    icon: Icon(precoCorreto ? Icons.check_circle : Icons.check_circle_outline),
+                    label: const Text("Sim"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: precoCorreto ? AppColors.success : Colors.grey[300],
+                      foregroundColor: precoCorreto ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        precoCorreto = false;
+                      });
+                    },
+                    icon: Icon(!precoCorreto ? Icons.cancel : Icons.cancel_outlined),
+                    label: const Text("Não"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: !precoCorreto ? AppColors.error : Colors.grey[300],
+                      foregroundColor: !precoCorreto ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+              
+              // Campo de preço (aparece apenas se "Não" for selecionado)
+              if (!precoCorreto) ...[
+                const SizedBox(height: 20),
+                const Text(
+                  "Qual é o preço correto?",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: precoController,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  decoration: InputDecoration(
+                    labelText: "Preço (R\$)",
+                    hintText: "Ex: 5.89",
+                    prefixText: "R\$ ",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+          actions: [
+            SecondaryButton(
+              label: "Pular",
+              onPressed: () {
+                Navigator.pop(context); // Fecha o diálogo
+                Navigator.pop(context); // Volta para a tela anterior
+              },
+            ),
+            PrimaryButton(
+              label: "Enviar",
+              onPressed: () async {
+                if (!precoCorreto) {
+                  // Validar preço inserido
+                  final precoTexto = precoController.text.trim();
+                  if (precoTexto.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Por favor, insira o preço correto"),
+                        backgroundColor: AppColors.error,
+                      ),
+                    );
+                    return;
+                  }
+
+                  // Converter para double
+                  final precoNovo = double.tryParse(precoTexto.replaceAll(',', '.'));
+                  if (precoNovo == null || precoNovo <= 0) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Preço inválido"),
+                        backgroundColor: AppColors.error,
+                      ),
+                    );
+                    return;
+                  }
+
+                  // Enviar atualização para o backend
+                  await _atualizarPreco(precoNovo);
+                }
+
+                Navigator.pop(context); // Fecha o diálogo
+                Navigator.pop(context); // Volta para a tela anterior
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// 📡 Envia atualização de preço para o backend
+  Future<void> _atualizarPreco(double novoPreco) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://alabsv.ddns.net:3001/api/precos/atualizar'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'posto_id': widget.posto.id,
+          'nome_posto': widget.posto.nome,
+          'preco': novoPreco,
+          'produto': 'Gasolina', // Tipo padrão
+          'data_atualizacao': DateTime.now().toIso8601String(),
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("✅ Preço atualizado com sucesso!"),
+              backgroundColor: AppColors.success,
+            ),
+          );
+        }
+      } else {
+        throw Exception('Erro ao atualizar preço: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('❌ Erro ao atualizar preço: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Erro ao atualizar preço. Tente novamente."),
+            backgroundColor: AppColors.warning,
+          ),
+        );
+      }
+    }
   }
 }
