@@ -12,6 +12,9 @@ const favoritosRoutes = require('./routes/favoritosRoutes');
 const avaliacoesRoutes = require('./routes/avaliacoesRoutes');
 const fotosRoutes = require('./routes/fotosRoutes');
 
+// 🤖 Serviço de auto-importação
+const autoImportService = require('./services/autoImportService');
+
 const app = express();
 const PORT = 3001;
 
@@ -45,12 +48,57 @@ app.get('/', (req, res) => {
       importar: '/api/importar',
       favoritos: '/api/favoritos',
       avaliacoes: '/api/avaliacoes',
-      fotos: '/api/fotos'
+      fotos: '/api/fotos',
+      admin: {
+        status: '/api/admin/status',
+        forcarImportacao: '/api/admin/forcar-importacao'
+      }
     }
   });
 });
 
-app.listen(PORT, () => {
+// 🔧 Rotas de Administração
+app.get('/api/admin/status', async (req, res) => {
+  try {
+    const pool = require('./config/database');
+    const result = await pool.query('SELECT COUNT(*) as total FROM postos');
+    const total = parseInt(result.rows[0].total);
+    
+    res.json({
+      sucesso: true,
+      postos_no_banco: total,
+      banco_vazio: total < 10,
+      auto_importacao_disponivel: true,
+      google_api_key_configurada: !!process.env.GOOGLE_PLACES_API_KEY
+    });
+  } catch (error) {
+    res.status(500).json({
+      sucesso: false,
+      erro: error.message
+    });
+  }
+});
+
+app.post('/api/admin/forcar-importacao', async (req, res) => {
+  try {
+    console.log('🚀 Forçando importação manual via API...');
+    const resultado = await autoImportService.executarImportacaoAutomatica();
+    
+    res.json({
+      sucesso: true,
+      resultado
+    });
+  } catch (error) {
+    console.error('❌ Erro ao forçar importação:', error);
+    res.status(500).json({
+      sucesso: false,
+      erro: error.message,
+      stack: error.stack
+    });
+  }
+});
+
+app.listen(PORT, async () => {
   console.log(`🚀 Servidor rodando na porta ${PORT}`);
   console.log(`📍 http://localhost:${PORT}`);
   console.log(`\n✅ Endpoints disponíveis:`);
@@ -62,6 +110,13 @@ app.listen(PORT, () => {
   console.log(`  • /api/favoritos - Favoritos do usuário`);
   console.log(`  • /api/avaliacoes - Avaliações dos postos`);
   console.log(`  • /api/fotos - Upload e fotos dos postos`);
+  
+  // 🤖 Executar auto-importação de postos (apenas se banco estiver vazio)
+  try {
+    await autoImportService.executarImportacaoAutomatica();
+  } catch (error) {
+    console.error('⚠️  Erro na auto-importação (não crítico):', error.message);
+  }
 });
 
 module.exports = app;
