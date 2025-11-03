@@ -48,9 +48,54 @@ app.get('/', (req, res) => {
       importar: '/api/importar',
       favoritos: '/api/favoritos',
       avaliacoes: '/api/avaliacoes',
-      fotos: '/api/fotos'
+      fotos: '/api/fotos',
+      admin: {
+        status: '/api/admin/status',
+        forcarImportacao: '/api/admin/forcar-importacao'
+      }
     }
   });
+});
+
+// 🔧 Rotas de Administração
+app.get('/api/admin/status', async (req, res) => {
+  try {
+    const pool = require('./config/database');
+    const result = await pool.query('SELECT COUNT(*) as total FROM postos');
+    const total = parseInt(result.rows[0].total);
+    
+    res.json({
+      sucesso: true,
+      postos_no_banco: total,
+      banco_vazio: total < 10,
+      auto_importacao_disponivel: true,
+      google_api_key_configurada: !!process.env.GOOGLE_PLACES_API_KEY
+    });
+  } catch (error) {
+    res.status(500).json({
+      sucesso: false,
+      erro: error.message
+    });
+  }
+});
+
+app.post('/api/admin/forcar-importacao', async (req, res) => {
+  try {
+    console.log('🚀 Forçando importação manual via API...');
+    const resultado = await autoImportService.executarImportacaoAutomatica();
+    
+    res.json({
+      sucesso: true,
+      resultado
+    });
+  } catch (error) {
+    console.error('❌ Erro ao forçar importação:', error);
+    res.status(500).json({
+      sucesso: false,
+      erro: error.message,
+      stack: error.stack
+    });
+  }
 });
 
 app.listen(PORT, async () => {
