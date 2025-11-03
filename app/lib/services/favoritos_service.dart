@@ -4,6 +4,7 @@ import '../models/favorito.dart';
 
 class FavoritosService {
   static const String baseUrl = 'http://alabsv.ddns.net:3001/api/favoritos';
+  // static const String baseUrl = 'http://192.168.1.2:3001/api/favoritos';
 
   // Listar favoritos do usuário
   Future<List<Favorito>> listar(int usuarioId) async {

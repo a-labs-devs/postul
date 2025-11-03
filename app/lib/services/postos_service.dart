@@ -4,7 +4,10 @@ import '../models/posto.dart';
 import 'cache_service.dart';
 
 class PostosService {
+  // PRODUÇÃO: Domínio DDNS com port forwarding configurado
   static const String baseUrl = 'http://alabsv.ddns.net:3001/api/postos';
+  // DESENVOLVIMENTO: Use quando estiver testando localmente
+  // static const String baseUrl = 'http://192.168.1.2:3001/api/postos';
   final CacheService _cacheService = CacheService();
 
   // Listar todos os postos COM CACHE
@@ -16,29 +19,50 @@ class PostosService {
         if (cachedData != null && cachedData.isNotEmpty) {
           print('⚡ Carregando postos do cache (${cachedData.length} itens)');
           return cachedData.map((json) => Posto.fromJson(json)).toList();
+        } else {
+          print('ℹ️ Nenhum cache encontrado. Buscando do servidor...');
         }
       }
 
       // 2. Se não há cache ou forçou atualização, buscar do servidor
-      print('🌐 Buscando postos do servidor...');
+      print('🌐 Buscando postos do servidor: $baseUrl/listar');
       final response = await http.get(
         Uri.parse('$baseUrl/listar'),
         headers: {'ngrok-skip-browser-warning': 'true'},
-      ).timeout(Duration(seconds: 10));
+      ).timeout(Duration(seconds: 15));
 
+      print('📡 Resposta do servidor: ${response.statusCode}');
+      
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final List postosJson = data['postos'];
+        
+        print('✅ ${postosJson.length} postos recebidos do servidor');
         
         // 3. Salvar no cache para próxima vez
         await _cacheService.salvarPostos(postosJson.cast<Map<String, dynamic>>());
         
         return postosJson.map((json) => Posto.fromJson(json)).toList();
       } else {
+        print('⚠️ Erro HTTP ${response.statusCode}: ${response.body}');
         throw Exception('Erro HTTP ${response.statusCode}: ${response.body}');
       }
     } catch (e) {
       print('❌ Erro ao buscar postos: $e');
+      print('❌ Tipo de erro: ${e.runtimeType}');
+      
+      // Tentar usar cache antigo como fallback
+      try {
+        print('🔄 Tentando usar cache antigo como fallback...');
+        final cachedData = await _cacheService.obterPostos(ignorarValidade: true);
+        if (cachedData != null && cachedData.isNotEmpty) {
+          print('✅ Usando ${cachedData.length} postos do cache antigo (MODO OFFLINE)');
+          return cachedData.map((json) => Posto.fromJson(json)).toList();
+        }
+      } catch (cacheError) {
+        print('❌ Falha ao carregar cache: $cacheError');
+      }
+      
       // Propagar o erro para ser tratado na UI
       rethrow;
     }
@@ -55,24 +79,48 @@ class PostosService {
     try {
       final url = '$baseUrl/area?latMin=$latMin&latMax=$latMax&lngMin=$lngMin&lngMax=$lngMax&limit=$limit';
       print('🗺️ Buscando postos na área visível do mapa...');
+      print('   URL: $url');
       
       final response = await http.get(
         Uri.parse(url),
         headers: {'ngrok-skip-browser-warning': 'true'},
-      ).timeout(Duration(seconds: 10));
+      ).timeout(Duration(seconds: 15));
 
+      print('📡 Resposta do servidor: ${response.statusCode}');
+      
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final List postosJson = data['postos'];
         print('✅ ${postosJson.length} postos carregados na área');
         return postosJson.map((json) => Posto.fromJson(json)).toList();
       } else {
+        print('⚠️ Erro HTTP ${response.statusCode}: ${response.body}');
         throw Exception('Erro HTTP ${response.statusCode}: ${response.body}');
       }
     } catch (e) {
       print('❌ Erro ao buscar postos por área: $e');
-      // Propagar o erro para ser tratado na UI
-      rethrow;
+      print('❌ Tipo de erro: ${e.runtimeType}');
+      
+      // Fallback: tentar usar listarTodos() que tem cache
+      print('🔄 Tentando fallback com listarTodos()...');
+      try {
+        final todosPostos = await listarTodos();
+        
+        // Filtrar postos dentro da área manualmente
+        final postosFiltrados = todosPostos.where((posto) {
+          return posto.latitude >= latMin &&
+                 posto.latitude <= latMax &&
+                 posto.longitude >= lngMin &&
+                 posto.longitude <= lngMax;
+        }).take(limit).toList();
+        
+        print('✅ Fallback: ${postosFiltrados.length} postos filtrados localmente');
+        return postosFiltrados;
+      } catch (fallbackError) {
+        print('❌ Fallback falhou: $fallbackError');
+        // Propagar o erro original
+        rethrow;
+      }
     }
   }
 

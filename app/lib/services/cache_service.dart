@@ -28,7 +28,8 @@ class CacheService {
   }
 
   /// Obter postos do cache (se válido)
-  Future<List<Map<String, dynamic>>?> obterPostos() async {
+  /// Se [ignorarValidade] for true, retorna dados mesmo que expirados (útil como fallback)
+  Future<List<Map<String, dynamic>>?> obterPostos({bool ignorarValidade = false}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       
@@ -38,12 +39,14 @@ class CacheService {
         return null;
       }
 
-      // Verificar validade do cache
-      final timestamp = prefs.getInt(_keyPostosTimestamp);
-      if (timestamp == null || !_isCacheValid(timestamp)) {
-        print('⏰ Cache: Dados de postos expirados');
-        await limparPostos();
-        return null;
+      // Verificar validade do cache (a menos que seja ignorada)
+      if (!ignorarValidade) {
+        final timestamp = prefs.getInt(_keyPostosTimestamp);
+        if (timestamp == null || !_isCacheValid(timestamp)) {
+          print('⏰ Cache: Dados de postos expirados');
+          await limparPostos();
+          return null;
+        }
       }
 
       // Recuperar dados
@@ -54,8 +57,15 @@ class CacheService {
       final List<Map<String, dynamic>> postos = 
           decoded.map((e) => Map<String, dynamic>.from(e)).toList();
       
-      final idade = _getCacheAge(timestamp);
-      print('✅ Cache: ${postos.length} postos carregados (idade: ${idade}min)');
+      final timestamp = prefs.getInt(_keyPostosTimestamp);
+      final idade = timestamp != null ? _getCacheAge(timestamp) : -1;
+      
+      if (ignorarValidade && idade > _cacheValidityMinutes) {
+        print('⚠️ Cache: ${postos.length} postos carregados (EXPIRADO - idade: ${idade}min)');
+      } else {
+        print('✅ Cache: ${postos.length} postos carregados (idade: ${idade}min)');
+      }
+      
       return postos;
     } catch (e) {
       print('❌ Erro ao obter postos do cache: $e');

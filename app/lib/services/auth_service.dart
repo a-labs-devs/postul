@@ -4,8 +4,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/usuario.dart';
 
 class AuthService {
-  // IMPORTANTE: Use o IP da sua máquina aqui
+  // IMPORTANTE: Use o domínio DDNS com port forwarding
   static const String baseUrl = 'http://alabsv.ddns.net:3001/api/auth';
+  // static const String baseUrl = 'http://192.168.1.2:3001/api/auth';
   Future<Map<String, dynamic>> cadastrar({
     required String nome,
     required String email,

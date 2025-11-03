@@ -42,7 +42,27 @@ class _MapScreenState extends State<MapScreen> {
     super.initState();
     _criarIconesCustomizados();
     _obterLocalizacaoReal();
-    // Não carrega postos aqui - espera o mapa inicializar
+    // Carregar postos do cache imediatamente (enquanto aguarda localização e mapa)
+    _carregarPostosInicial();
+  }
+
+  /// 📍 Carregamento inicial de postos (tenta cache primeiro)
+  Future<void> _carregarPostosInicial() async {
+    try {
+      print('🚀 Carregando postos iniciais...');
+      // Usa listarTodos que tem cache integrado
+      final postos = await _postosService.listarTodos();
+      
+      if (postos.isNotEmpty && mounted) {
+        setState(() {
+          _postos = postos;
+        });
+        print('✅ ${postos.length} postos carregados inicialmente');
+      }
+    } catch (e) {
+      print('⚠️ Não foi possível carregar postos iniciais: $e');
+      // Não mostra erro aqui, pois o carregamento real acontecerá quando o mapa inicializar
+    }
   }
 
   /// 📍 Obter localização real do GPS
@@ -170,18 +190,51 @@ class _MapScreenState extends State<MapScreen> {
       
       setState(() => _isLoading = false);
       
-      // Notificar usuário sobre o erro
+      // Notificar usuário sobre o erro com mensagem específica
       if (mounted) {
+        String mensagemErro = 'Erro ao carregar postos.';
+        
+        if (e.toString().contains('SocketException') || 
+            e.toString().contains('Failed host lookup') ||
+            e.toString().contains('TimeoutException')) {
+          mensagemErro = 'Sem conexão com o servidor. Verifique sua internet.';
+        } else if (e.toString().contains('HTTP')) {
+          mensagemErro = 'Servidor indisponível no momento.';
+        }
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erro ao carregar postos. Verifique sua conexão.'),
-            backgroundColor: Colors.red,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.warning_amber_rounded, color: Colors.white, size: 20),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        mensagemErro,
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 4),
+                Text(
+                  'Os postos serão carregados quando a conexão for restabelecida.',
+                  style: TextStyle(fontSize: 12, color: Colors.white70),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.red.shade700,
             action: SnackBarAction(
               label: 'Tentar novamente',
               textColor: Colors.white,
               onPressed: _carregarPostos,
             ),
-            duration: Duration(seconds: 5),
+            duration: Duration(seconds: 7),
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
