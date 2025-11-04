@@ -36,6 +36,7 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
   }
 
   Future<void> _loadRoutes() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
     try {
@@ -44,12 +45,14 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
       // Calcular múltiplas rotas alternativas
       final routes = await _calculateMultipleRoutes(widget.origem, destino);
       
+      if (!mounted) return;
       setState(() {
         _routes = routes;
         _isLoading = false;
       });
     } catch (e) {
       print('Erro ao calcular rotas: $e');
+      if (!mounted) return;
       setState(() => _isLoading = false);
       
       if (mounted) {
