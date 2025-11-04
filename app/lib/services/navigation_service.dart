@@ -7,8 +7,9 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'voice_instructions_service.dart';
 
 class NavigationService {
-  // SUBSTITUA PELA SUA CHAVE DO GOOGLE MAPS
-  final String apiKey = 'AIzaSyDTIpHb1i5mrduNAwRHFV1zamBhWrhhgXc';
+  // IMPORTANTE: Esta key precisa ter Directions API habilitada no Google Cloud Console
+  // Mesma key do backend (GOOGLE_PLACES_API_KEY)
+  final String apiKey = 'AIzaSyCNBbClo1L_0qU4mVxEybrdzbRHVfWfG-A';
   final VoiceInstructionsService voiceService = VoiceInstructionsService();
   
   StreamController<Position> positionStreamController = StreamController<Position>.broadcast();
