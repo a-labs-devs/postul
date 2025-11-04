@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 import '../../routes/routes.dart';
+import '../../services/auth_service.dart';
 
 /// 🔐 POSTUL - Tela de Login
 class LoginScreen extends StatefulWidget {
@@ -15,6 +16,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _authService = AuthService();
   bool _isLoading = false;
   bool _obscurePassword = true;
   late AnimationController _animController;
@@ -64,16 +66,51 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
       return;
     }
 
+    if (!mounted) return;
     setState(() => _isLoading = true);
 
-    // Simular login
-    await Future.delayed(const Duration(seconds: 2));
+    try {
+      // Autenticação REAL com backend
+      final resultado = await _authService.login(
+        email: _emailController.text.trim(),
+        senha: _passwordController.text,
+      );
 
-    if (mounted) {
-      Navigator.pushReplacementNamed(
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+
+      if (resultado['sucesso'] == true) {
+        // Login bem-sucedido
+        CustomSnackbar.show(
+          context,
+          message: resultado['mensagem'] ?? 'Login realizado com sucesso!',
+          type: SnackbarType.success,
+        );
+
+        // Navegar para o mapa
+        if (mounted) {
+          Navigator.pushReplacementNamed(
+            context,
+            AppRoutes.map,
+            arguments: MapScreenArgs(0),
+          );
+        }
+      } else {
+        // Login falhou - senha incorreta ou usuário não encontrado
+        CustomSnackbar.show(
+          context,
+          message: resultado['mensagem'] ?? 'Email ou senha incorretos',
+          type: SnackbarType.error,
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      
+      CustomSnackbar.show(
         context,
-        AppRoutes.map,
-        arguments: MapScreenArgs(0),
+        message: 'Erro ao fazer login: $e',
+        type: SnackbarType.error,
       );
     }
   }
