@@ -9,7 +9,7 @@ import java.io.FileInputStream
 
 android {
     namespace = "com.alabsv.postul"
-    compileSdk = 34
+    compileSdk = 36
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
