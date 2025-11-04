@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Gerador Feature Graphic POSTUL</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        #canvas {
+            border: 2px solid #333;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 600px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        h1 {
+            color: #333;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 Gerador Feature Graphic POSTUL</h1>
+    
+    <div class="info">
+        <strong>📐 Especificações Play Store:</strong>
+        <ul>
+            <li>Tamanho: <strong>1024 x 500 px</strong></li>
+            <li>Formato: PNG ou JPG</li>
+            <li>Uso: Banner principal da loja</li>
+        </ul>
+    </div>
+
+    <div class="controls">
+        <button onclick="generateFeatureGraphic()">🎨 Gerar Feature Graphic</button>
+        <button onclick="downloadImage()">💾 Baixar PNG</button>
+    </div>
+
+    <canvas id="canvas" width="1024" height="500"></canvas>
+
+    <script>
+        function generateFeatureGraphic() {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Fundo gradiente azul
+            const gradient = ctx.createLinearGradient(0, 0, 1024, 500);
+            gradient.addColorStop(0, '#1E88E5');
+            gradient.addColorStop(1, '#0D47A1');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 1024, 500);
+            
+            // Efeito de brilho/reflexo
+            ctx.shadowColor = 'rgba(255, 255, 255, 0.3)';
+            ctx.shadowBlur = 40;
+            ctx.shadowOffsetY = -20;
+            
+            // Círculos decorativos transparentes (fundo)
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.beginPath();
+            ctx.arc(150, 250, 200, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.arc(900, 250, 150, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.shadowBlur = 0;
+            
+            // Ícone grande (pin + bomba) - esquerda
+            ctx.save();
+            ctx.translate(200, 250);
+            ctx.scale(1.5, 1.5);
+            
+            // Pin dourado
+            const pinGradient = ctx.createLinearGradient(-30, -40, 30, 40);
+            pinGradient.addColorStop(0, '#FFD700');
+            pinGradient.addColorStop(1, '#FFA000');
+            ctx.fillStyle = pinGradient;
+            
+            ctx.beginPath();
+            ctx.arc(0, -10, 35, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.moveTo(-22, 15);
+            ctx.bezierCurveTo(-15, 45, 15, 45, 22, 15);
+            ctx.lineTo(0, 60);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Bomba branca dentro do pin
+            ctx.fillStyle = 'white';
+            ctx.fillRect(-12, -18, 24, 30);
+            
+            // Display dourado
+            ctx.fillStyle = '#FFD700';
+            ctx.fillRect(-8, -12, 16, 8);
+            
+            // Mangueira
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(12, -5);
+            ctx.quadraticCurveTo(25, -8, 30, 0);
+            ctx.stroke();
+            
+            ctx.restore();
+            
+            // Texto "POSTUL" grande - centro-direita
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            ctx.shadowBlur = 15;
+            ctx.shadowOffsetX = 3;
+            ctx.shadowOffsetY = 3;
+            
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 140px Arial';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('POSTUL', 380, 200);
+            
+            // Subtítulo
+            ctx.shadowBlur = 10;
+            ctx.font = 'bold 42px Arial';
+            ctx.fillStyle = '#FFD700';
+            ctx.fillText('Posto Mais Barato', 380, 300);
+            
+            // Ícone de localização pequeno + texto
+            ctx.shadowBlur = 5;
+            ctx.fillStyle = 'white';
+            ctx.font = '28px Arial';
+            ctx.fillText('📍 Encontre • 💰 Compare • 🗺️ Navegue', 380, 360);
+            
+            alert('✅ Feature Graphic gerada! Clique em "Baixar PNG"');
+        }
+
+        function downloadImage() {
+            const canvas = document.getElementById('canvas');
+            const link = document.createElement('a');
+            link.download = 'feature-graphic-1024x500.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            alert('✅ Feature Graphic baixada! Salve em: app/assets/');
+        }
+
+        // Gerar automaticamente ao carregar
+        window.onload = generateFeatureGraphic;
+    </script>
+
+    <div class="info">
+        <strong>✨ Descrição do Design:</strong>
+        <ul>
+            <li>🎨 Fundo: Gradiente azul profissional (#1E88E5 → #0D47A1)</li>
+            <li>🏆 Ícone: Pin dourado com bomba detalhada (esquerda)</li>
+            <li>📝 Texto: "POSTUL" grande e bold em branco</li>
+            <li>💬 Subtítulo: "Posto Mais Barato" em dourado</li>
+            <li>🎯 Recursos: Ícones + texto descritivo</li>
+            <li>✨ Efeitos: Sombras e círculos decorativos</li>
+            <li>📐 Dimensão: 1024 x 500 px (Play Store compliant)</li>
+        </ul>
+    </div>
+</body>
+</html>
