@@ -33,8 +33,8 @@ class PostoComRota {
 
 class RotasService {
   // IMPORTANTE: Esta key precisa ter Directions API habilitada no Google Cloud Console
-  // Mesma key do backend (GOOGLE_PLACES_API_KEY)
-  static const String _apiKey = 'AIzaSyBCU-x2XxajmJLUlnMhnKP5CnOqH0opsro';
+  // Key SEM RESTRIÇÕES para teste - TEMPORÁRIO
+  static const String _apiKey = 'AIzaSyD1p9PvEu2CwvKtFbyDUT0ocLjWc5hCJJw';
   static const String _baseUrl = 'https://maps.googleapis.com/maps/api/directions/json';
 
   // Calcular rota entre dois pontos usando Google Maps

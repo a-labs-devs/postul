@@ -8,8 +8,8 @@ import 'voice_instructions_service.dart';
 
 class NavigationService {
   // IMPORTANTE: Esta key precisa ter Directions API habilitada no Google Cloud Console
-  // Mesma key do backend (GOOGLE_PLACES_API_KEY)
-  final String apiKey = 'AIzaSyBCU-x2XxajmJLUlnMhnKP5CnOqH0opsro';
+  // Key SEM RESTRIÇÕES para teste - TEMPORÁRIO
+  final String apiKey = 'AIzaSyD1p9PvEu2CwvKtFbyDUT0ocLjWc5hCJJw';
   final VoiceInstructionsService voiceService = VoiceInstructionsService();
   
   StreamController<Position> positionStreamController = StreamController<Position>.broadcast();
