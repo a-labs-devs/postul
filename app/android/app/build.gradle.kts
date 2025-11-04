@@ -5,8 +5,8 @@ plugins {
 }
 
 android {
-    namespace = "com.example.postul"
-    compileSdk = 36
+    namespace = "com.alabsv.postul"
+    compileSdk = 34
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -19,17 +19,39 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.postul"
+        applicationId = "com.alabsv.postul"
         minSdk = flutter.minSdkVersion
-        targetSdk = 36
+        targetSdk = 34
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         multiDexEnabled = true
     }
 
+    signingConfigs {
+        create("release") {
+            // Configuração será adicionada via key.properties
+            val keystorePropertiesFile = rootProject.file("key.properties")
+            if (keystorePropertiesFile.exists()) {
+                val keystoreProperties = java.util.Properties()
+                keystoreProperties.load(java.io.FileInputStream(keystorePropertiesFile))
+                
+                storeFile = file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+            }
+        }
+    }
+
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 }

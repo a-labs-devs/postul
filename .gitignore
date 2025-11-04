@@ -56,6 +56,14 @@ backend/*.cert
 **/*-credentials.json
 **/*-service-account.json
 
+# 🔐 Android Keystore (CRÍTICO - NÃO VERSIONAR)
+*.jks
+*.keystore
+**/key.properties
+app/android/key.properties
+app/android/*.jks
+app/android/*.keystore
+
 # Uploads (arquivos enviados pelos usuários)
 backend/uploads/**/*
 !backend/uploads/.gitkeep
