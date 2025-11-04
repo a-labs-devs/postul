@@ -37,10 +37,10 @@
         android:enableOnBackInvokedCallback="true">
 
         <!-- Google Maps API Key -->
-        <!-- Usando mesma key do backend (tem Places + Directions + Maps SDK habilitados) -->
+        <!-- Key unificada: Places + Directions + Maps SDK -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyCNBbClo1L_0qU4mVxEybrdzbRHVfWfG-A"/>
+            android:value="AIzaSyBCU-x2XxajmJLUlnMhnKP5CnOqH0opsro"/>
         
         <activity
             android:name=".MainActivity"
