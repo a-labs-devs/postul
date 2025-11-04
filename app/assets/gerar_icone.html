@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Gerador de Ícone POSTUL</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        #canvas {
+            border: 2px solid #333;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            max-width: 600px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        h1 {
+            color: #333;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏍️ Gerador de Ícone POSTUL</h1>
+    
+    <div class="info">
+        <strong>Instruções:</strong>
+        <ol>
+            <li>Clique no botão abaixo para gerar o ícone</li>
+            <li>Clique com botão direito na imagem → "Salvar imagem como..."</li>
+            <li>Salve como: <code>icon-512.png</code></li>
+            <li>Use no Google Play Console</li>
+        </ol>
+    </div>
+
+    <div class="controls">
+        <button onclick="generateIcon()">🎨 Gerar Ícone 512x512</button>
+        <button onclick="downloadIcon()">💾 Baixar PNG</button>
+    </div>
+
+    <canvas id="canvas" width="512" height="512"></canvas>
+
+    <script>
+        function generateIcon() {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Fundo azul escuro com gradiente
+            const gradient = ctx.createLinearGradient(0, 0, 512, 512);
+            gradient.addColorStop(0, '#1E88E5');
+            gradient.addColorStop(1, '#0D47A1');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 512, 512);
+            
+            // Pin dourado
+            const pinGradient = ctx.createLinearGradient(200, 170, 312, 280);
+            pinGradient.addColorStop(0, '#FFD700');
+            pinGradient.addColorStop(1, '#FFA000');
+            ctx.fillStyle = pinGradient;
+            
+            // Círculo do pin
+            ctx.beginPath();
+            ctx.arc(256, 220, 55, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Ponta do pin (bezier curve)
+            ctx.beginPath();
+            ctx.moveTo(210, 250);
+            ctx.bezierCurveTo(220, 290, 292, 290, 302, 250);
+            ctx.lineTo(256, 320);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Bomba de gasolina ULTRA DETALHADA dentro do pin (branca)
+            ctx.fillStyle = 'white';
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            
+            // Topo da bomba (arredondado)
+            ctx.beginPath();
+            ctx.arc(256, 200, 18, Math.PI, 0, false);
+            ctx.fill();
+            
+            // Corpo principal da bomba
+            ctx.fillRect(238, 200, 36, 45);
+            
+            // Base da bomba (arredondada)
+            ctx.beginPath();
+            ctx.arc(256, 245, 18, 0, Math.PI, false);
+            ctx.fill();
+            
+            // Display digital (dourado com preço)
+            ctx.fillStyle = '#FFD700';
+            ctx.fillRect(243, 207, 26, 15);
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 8px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('$3.45', 256, 217);
+            
+            // 3 Botões de seleção (círculos dourados)
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.arc(248, 228, 3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(256, 228, 3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(264, 228, 3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Mangueira curvada (detalhada)
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 6;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(274, 220);
+            ctx.quadraticCurveTo(290, 215, 295, 225);
+            ctx.stroke();
+            
+            // Bico da mangueira
+            ctx.fillStyle = 'white';
+            ctx.fillRect(293, 223, 8, 12);
+            
+            // Gatilho do bico (dourado)
+            ctx.fillStyle = '#FFD700';
+            ctx.fillRect(298, 228, 3, 5);
+            
+            // Logo de gota de combustível no topo
+            ctx.fillStyle = '#FFD700';
+            ctx.beginPath();
+            ctx.moveTo(256, 195);
+            ctx.bezierCurveTo(252, 192, 252, 188, 256, 185);
+            ctx.bezierCurveTo(260, 188, 260, 192, 256, 195);
+            ctx.fill();
+            
+            // Texto "POSTUL" embaixo
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 70px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('POSTUL', 256, 420);
+            
+            alert('✅ Ícone ULTRA DETALHADO gerado! Clique em "Baixar PNG"');
+        }
+
+        function downloadIcon() {
+            const canvas = document.getElementById('canvas');
+            const link = document.createElement('a');
+            link.download = 'icon-512.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            alert('✅ Ícone baixado! Salve na pasta: app/assets/icon-512.png');
+        }
+
+        // Gerar automaticamente ao carregar
+        window.onload = generateIcon;
+    </script>
+
+    <div class="info">
+        <strong>📋 Design do Ícone ULTRA DETALHADO v2:</strong>
+        <ul>
+            <li>🎨 Fundo: Gradiente azul escuro (#1E88E5 → #0D47A1)</li>
+            <li>📍 Pin de localização DOURADO:
+                <ul>
+                    <li>⛽ Bomba ultra detalhada branca</li>
+                    <li>💰 Display digital com preço "$3.45"</li>
+                    <li>� 3 botões de seleção dourados</li>
+                    <li>🔗 Mangueira curvada realista</li>
+                    <li>🔫 Bico com gatilho dourado</li>
+                    <li>💧 Logo de gota de combustível no topo</li>
+                    <li>📐 Base e topo arredondados</li>
+                </ul>
+            </li>
+            <li>📝 Texto "POSTUL" grande em branco</li>
+            <li>✨ Estilo: Ultra detalhado e realista</li>
+            <li>📐 Tamanho: 512x512px (Play Store)</li>
+        </ul>
+    </div>
+</body>
+</html>
