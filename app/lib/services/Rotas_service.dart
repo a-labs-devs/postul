@@ -52,11 +52,15 @@ class RotasService {
       );
 
       print('🔍 Buscando rota...');
+      print('🔗 URL: $url');
+      print('🔑 API Key: ${_apiKey.substring(0, 20)}...');
       
       final response = await http.get(url);
+      print('📡 Status HTTP: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        print('📦 Response status: ${data['status']}');
         
         if (data['status'] == 'OK' && data['routes'] != null && data['routes'].isNotEmpty) {
           final route = data['routes'][0];
