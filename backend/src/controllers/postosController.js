@@ -1,5 +1,4 @@
 const pool = require('../config/database');
-const autoImportService = require('../services/autoImportService');
 
 const postosController = {
   // Listar todos os postos
@@ -138,59 +137,6 @@ const postosController = {
         GROUP BY p.id, p.nome, p.endereco, p.latitude, p.longitude, p.telefone, p.aberto_24h
         LIMIT $5
       `, [latMin, latMax, lngMin, lngMax, limitePostos]);
-
-      // 🤖 AUTO-IMPORTAÇÃO: Se não encontrou postos, tenta importar da região
-      if (resultado.rows.length === 0) {
-        console.log(`🤖 Nenhum posto encontrado na área. Tentando importar...`);
-        
-        const latCentro = (parseFloat(latMin) + parseFloat(latMax)) / 2;
-        const lngCentro = (parseFloat(lngMin) + parseFloat(lngMax)) / 2;
-        
-        try {
-          const importResult = await autoImportService.importarRegiao(latCentro, lngCentro, 10000);
-          
-          if (importResult.sucesso && importResult.importados > 0) {
-            // Tentar buscar novamente após importação
-            const novoResultado = await pool.query(`
-              SELECT 
-                p.id,
-                COALESCE(p.nome, 'Posto sem nome') as nome,
-                COALESCE(p.endereco, 'Endereço não informado') as endereco,
-                COALESCE(p.latitude::text, '0')::numeric as latitude,
-                COALESCE(p.longitude::text, '0')::numeric as longitude,
-                COALESCE(p.telefone, '') as telefone,
-                COALESCE(p.aberto_24h, false) as aberto_24h,
-                COALESCE(
-                  json_agg(
-                    json_build_object(
-                      'tipo', COALESCE(pc.tipo_combustivel, ''),
-                      'preco', COALESCE(pc.preco, 0)
-                    )
-                  ) FILTER (WHERE pc.id IS NOT NULL),
-                  '[]'::json
-                ) as precos
-              FROM postos p
-              LEFT JOIN precos_combustivel pc ON p.id = pc.posto_id
-              WHERE p.latitude BETWEEN $1 AND $2
-                AND p.longitude BETWEEN $3 AND $4
-                AND p.id IS NOT NULL
-              GROUP BY p.id, p.nome, p.endereco, p.latitude, p.longitude, p.telefone, p.aberto_24h
-              LIMIT $5
-            `, [latMin, latMax, lngMin, lngMax, limitePostos]);
-            
-            return res.json({
-              sucesso: true,
-              total: novoResultado.rows.length,
-              postos: novoResultado.rows,
-              autoImportado: true,
-              importados: importResult.importados
-            });
-          }
-        } catch (importError) {
-          console.error('⚠️  Erro na auto-importação:', importError.message);
-          // Continua mesmo se importação falhar
-        }
-      }
 
       res.json({
         sucesso: true,

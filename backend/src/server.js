@@ -12,9 +12,6 @@ const favoritosRoutes = require('./routes/favoritosRoutes');
 const avaliacoesRoutes = require('./routes/avaliacoesRoutes');
 const fotosRoutes = require('./routes/fotosRoutes');
 
-// 🤖 Serviço de auto-importação
-const autoImportService = require('./services/autoImportService');
-
 const app = express();
 const PORT = 3001;
 
@@ -50,8 +47,7 @@ app.get('/', (req, res) => {
       avaliacoes: '/api/avaliacoes',
       fotos: '/api/fotos',
       admin: {
-        status: '/api/admin/status',
-        forcarImportacao: '/api/admin/forcar-importacao'
+        status: '/api/admin/status'
       }
     }
   });
@@ -68,32 +64,12 @@ app.get('/api/admin/status', async (req, res) => {
       sucesso: true,
       postos_no_banco: total,
       banco_vazio: total < 10,
-      auto_importacao_disponivel: true,
       google_api_key_configurada: !!process.env.GOOGLE_PLACES_API_KEY
     });
   } catch (error) {
     res.status(500).json({
       sucesso: false,
       erro: error.message
-    });
-  }
-});
-
-app.post('/api/admin/forcar-importacao', async (req, res) => {
-  try {
-    console.log('🚀 Forçando importação manual via API...');
-    const resultado = await autoImportService.executarImportacaoAutomatica();
-    
-    res.json({
-      sucesso: true,
-      resultado
-    });
-  } catch (error) {
-    console.error('❌ Erro ao forçar importação:', error);
-    res.status(500).json({
-      sucesso: false,
-      erro: error.message,
-      stack: error.stack
     });
   }
 });
@@ -110,13 +86,6 @@ app.listen(PORT, async () => {
   console.log(`  • /api/favoritos - Favoritos do usuário`);
   console.log(`  • /api/avaliacoes - Avaliações dos postos`);
   console.log(`  • /api/fotos - Upload e fotos dos postos`);
-  
-  // 🤖 Executar auto-importação de postos (apenas se banco estiver vazio)
-  try {
-    await autoImportService.executarImportacaoAutomatica();
-  } catch (error) {
-    console.error('⚠️  Erro na auto-importação (não crítico):', error.message);
-  }
 });
 
 module.exports = app;

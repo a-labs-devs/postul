@@ -29,8 +29,8 @@ class _MapScreenState extends State<MapScreen> {
   final PostosService _postosService = PostosService();
   List<models.Posto> _postos = [];
   Set<google_maps.Marker> _markers = {};
-  LatLng _userLocation = LatLng(-23.5505, -46.6333);
-  LatLng _mapCenter = LatLng(-23.5505, -46.6333);
+  LatLng? _userLocation;
+  LatLng? _mapCenter;
   double _mapZoom = 15.0;
   bool _isLoading = false;  // Mudado para false para não bloquear o mapa
   TipoCombustivel? _filtroAtivo;

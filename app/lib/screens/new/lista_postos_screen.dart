@@ -28,52 +28,10 @@ class _ListaPostosScreenState extends State<ListaPostosScreen> {
 
   Future<void> _carregarPostos() async {
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 1));
-
-    // Dados mockados
+    
+    // TODO: Implementar carregamento de postos da API
     setState(() {
-      _postos = [
-        Posto(
-          id: 1,
-          nome: 'Posto Shell Centro',
-          endereco: 'Av. Paulista, 1000',
-          latitude: -23.5505,
-          longitude: -46.6333,
-          aberto24h: true,
-          precos: null,
-          distancia: 0.5,
-        ),
-        Posto(
-          id: 2,
-          nome: 'Posto Ipiranga Norte',
-          endereco: 'Av. Rebouças, 2500',
-          latitude: -23.5555,
-          longitude: -46.6383,
-          aberto24h: false,
-          precos: null,
-          distancia: 1.2,
-        ),
-        Posto(
-          id: 3,
-          nome: 'Posto BR Sul',
-          endereco: 'Av. Brigadeiro Luís Antônio, 800',
-          latitude: -23.5455,
-          longitude: -46.6283,
-          aberto24h: true,
-          precos: null,
-          distancia: 0.8,
-        ),
-        Posto(
-          id: 4,
-          nome: 'Posto Petrobras Oeste',
-          endereco: 'Av. Faria Lima, 1500',
-          latitude: -23.5705,
-          longitude: -46.6933,
-          aberto24h: false,
-          precos: null,
-          distancia: 2.3,
-        ),
-      ];
+      _postos = [];
       _isLoading = false;
     });
   }

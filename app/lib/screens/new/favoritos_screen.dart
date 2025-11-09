@@ -4,6 +4,9 @@ import 'package:geolocator/geolocator.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 import '../../models/posto.dart';
+import '../../models/favorito.dart';
+import '../../services/favoritos_service.dart';
+import '../../services/auth_service.dart';
 import '../../routes/app_routes.dart';
 import '../../routes/app_router.dart';
 
@@ -16,8 +19,11 @@ class FavoritosScreen extends StatefulWidget {
 }
 
 class _FavoritosScreenState extends State<FavoritosScreen> {
-  List<Posto> _favoritos = [];
+  final FavoritosService _favoritosService = FavoritosService();
+  final AuthService _authService = AuthService();
+  List<Posto> _postos = [];
   bool _isLoading = true;
+  String? _erro;
 
   @override
   void initState() {
@@ -26,34 +32,56 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
   }
 
   Future<void> _carregarFavoritos() async {
-    setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 1));
-
     setState(() {
-      _favoritos = [
-        Posto(
-          id: 1,
-          nome: 'Posto Shell Centro',
-          endereco: 'Av. Paulista, 1000',
-          latitude: -23.5505,
-          longitude: -46.6333,
-          aberto24h: true,
-          precos: null,
-          distancia: 0.5,
-        ),
-        Posto(
-          id: 2,
-          nome: 'Posto Ipiranga Norte',
-          endereco: 'Av. Rebouças, 2500',
-          latitude: -23.5555,
-          longitude: -46.6383,
-          aberto24h: false,
-          precos: null,
-          distancia: 1.2,
-        ),
-      ];
-      _isLoading = false;
+      _isLoading = true;
+      _erro = null;
     });
+    
+    try {
+      // Obter usuário logado
+      final usuario = await _authService.usuarioAtual();
+      
+      if (usuario == null) {
+        setState(() {
+          _erro = 'Usuário não autenticado';
+          _isLoading = false;
+        });
+        return;
+      }
+
+      print('📱 Carregando favoritos do usuário ${usuario.id}...');
+      
+      // Buscar favoritos da API
+      final favoritos = await _favoritosService.listar(usuario.id);
+      
+      print('✅ ${favoritos.length} favoritos carregados');
+      
+      // Converter favoritos para lista de postos
+      final List<Posto> postosList = favoritos.map((fav) {
+        return Posto(
+          id: fav.postoId,
+          nome: fav.postoNome ?? 'Posto sem nome',
+          endereco: fav.postoEndereco ?? 'Endereço não disponível',
+          latitude: fav.latitude ?? 0,
+          longitude: fav.longitude ?? 0,
+          telefone: fav.telefone,
+          aberto24h: fav.aberto24h ?? false,
+          precos: fav.precos?.map((p) => p.toJson()).toList(),
+          distancia: null,
+        );
+      }).toList();
+      
+      setState(() {
+        _postos = postosList;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('❌ Erro ao carregar favoritos: $e');
+      setState(() {
+        _erro = 'Erro ao carregar favoritos: $e';
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -63,36 +91,83 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
         title: const Text("Meus Favoritos"),
         actions: [
           IconButton(
-            icon: const Icon(Icons.sort),
-            onPressed: () {
-              // TODO: Mostrar opções de ordenação
-            },
+            icon: const Icon(Icons.refresh),
+            onPressed: _carregarFavoritos,
+            tooltip: 'Atualizar',
           ),
         ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _favoritos.isEmpty
-              ? _buildEstadoVazio()
-              : ListView.builder(
-                  padding: EdgeInsets.all(AppSpacing.space16),
-                  itemCount: _favoritos.length,
-                  itemBuilder: (context, index) {
-                    final posto = _favoritos[index];
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: AppSpacing.space12),
-                      child: PostoFavoritoCard(
-                        nome: posto.nome,
-                        endereco: posto.endereco,
-                        preco: 5.49, // Mockado
-                        distancia: posto.distancia ?? 0,
-                        combustivelPreferido: "Gasolina",
-                        onNavigate: () => _navigateTo(posto),
-                        onRemove: () => _removerFavorito(posto),
-                      ),
-                    );
-                  },
-                ),
+          : _erro != null
+              ? _buildEstadoErro()
+              : _postos.isEmpty
+                  ? _buildEstadoVazio()
+                  : ListView.builder(
+                      padding: EdgeInsets.all(AppSpacing.space16),
+                      itemCount: _postos.length,
+                      itemBuilder: (context, index) {
+                        final posto = _postos[index];
+                        
+                        // Extrair preço do combustível preferido (se disponível)
+                        double? preco;
+                        if (posto.precos != null && posto.precos is List && (posto.precos as List).isNotEmpty) {
+                          final precoData = (posto.precos as List).first;
+                          preco = double.tryParse(precoData['preco']?.toString() ?? '0');
+                        }
+                        
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: AppSpacing.space12),
+                          child: PostoFavoritoCard(
+                            nome: posto.nome,
+                            endereco: posto.endereco,
+                            preco: preco,
+                            distancia: posto.distancia ?? 0,
+                            combustivelPreferido: "Gasolina",
+                            onNavigate: () => _navigateTo(posto),
+                            onRemove: () => _removerFavorito(posto),
+                          ),
+                        );
+                      },
+                    ),
+    );
+  }
+
+  Widget _buildEstadoErro() {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(AppSpacing.space24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 80,
+              color: AppColors.error,
+            ),
+            SizedBox(height: AppSpacing.space24),
+            Text(
+              'Erro ao carregar favoritos',
+              style: AppTypography.titleMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            ),
+            SizedBox(height: AppSpacing.space8),
+            Text(
+              _erro ?? 'Erro desconhecido',
+              style: AppTypography.bodyMedium.copyWith(
+                color: AppColors.textTertiary,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: AppSpacing.space32),
+            PrimaryButton(
+              label: "Tentar novamente",
+              onPressed: _carregarFavoritos,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -164,7 +239,7 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
     }
   }
 
-  void _removerFavorito(Posto posto) {
+  void _removerFavorito(Posto posto) async {
     CustomDialog.show(
       context,
       title: "Remover favorito?",
@@ -177,14 +252,49 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
         ),
         PrimaryButton(
           label: "Remover",
-          onPressed: () {
-            setState(() => _favoritos.remove(posto));
+          onPressed: () async {
             Navigator.pop(context);
-            CustomSnackbar.show(
-              context,
-              message: "Removido dos favoritos",
-              type: SnackbarType.success,
-            );
+            
+            try {
+              // Obter usuário logado
+              final usuario = await _authService.usuarioAtual();
+              
+              if (usuario == null) {
+                CustomSnackbar.show(
+                  context,
+                  message: "Usuário não autenticado",
+                  type: SnackbarType.error,
+                );
+                return;
+              }
+
+              // Remover da API
+              final sucesso = await _favoritosService.removerPorUsuarioEPosto(usuario.id, posto.id);
+              
+              if (sucesso) {
+                // Remover da lista local
+                setState(() => _postos.remove(posto));
+                
+                CustomSnackbar.show(
+                  context,
+                  message: "Removido dos favoritos",
+                  type: SnackbarType.success,
+                );
+              } else {
+                CustomSnackbar.show(
+                  context,
+                  message: "Erro ao remover favorito",
+                  type: SnackbarType.error,
+                );
+              }
+            } catch (e) {
+              print('❌ Erro ao remover favorito: $e');
+              CustomSnackbar.show(
+                context,
+                message: "Erro: $e",
+                type: SnackbarType.error,
+              );
+            }
           },
         ),
       ],

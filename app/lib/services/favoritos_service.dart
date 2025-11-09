@@ -79,6 +79,24 @@ class FavoritosService {
     }
   }
 
+  // Remover favorito por usuário e posto
+  Future<bool> removerPorUsuarioEPosto(int usuarioId, int postoId) async {
+    try {
+      // Primeiro, buscar o ID do favorito
+      final favoritos = await listar(usuarioId);
+      final favorito = favoritos.firstWhere(
+        (fav) => fav.postoId == postoId,
+        orElse: () => throw Exception('Favorito não encontrado'),
+      );
+
+      // Remover usando o ID
+      return await remover(favorito.id);
+    } catch (e) {
+      print('Erro ao remover favorito por usuário e posto: $e');
+      return false;
+    }
+  }
+
   // Atualizar favorito
   Future<bool> atualizar({
     required int favoritoId,
