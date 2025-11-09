@@ -1,0 +1,762 @@
+{
+  "info": {
+    "_postman_id": "postul-api-collection",
+    "name": "POSTUL API - Teste de Endpoints",
+    "description": "Coleção completa de endpoints da API POSTUL para testes",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://alabsv.ddns.net:3001",
+      "type": "string"
+    },
+    {
+      "key": "usuario_id",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "posto_id",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🏠 Root",
+      "item": [
+        {
+          "name": "Get API Info",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": ["{{base_url}}"],
+              "path": [""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "Cadastrar Usuário",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Teste Usuario\",\n  \"email\": \"teste@exemplo.com\",\n  \"senha\": \"senha123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/cadastrar",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "cadastrar"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"teste@exemplo.com\",\n  \"senha\": \"senha123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verificar Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/verificar",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "verificar"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Solicitar Recuperação de Senha",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"teste@exemplo.com\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/solicitar-recuperacao",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "solicitar-recuperacao"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Validar Código de Recuperação",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"teste@exemplo.com\",\n  \"codigo\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/validar-codigo",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "validar-codigo"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Redefinir Senha",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"teste@exemplo.com\",\n  \"codigo\": \"123456\",\n  \"nova_senha\": \"novaSenha123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/redefinir-senha",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "redefinir-senha"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "⛽ Postos",
+      "item": [
+        {
+          "name": "Listar Todos os Postos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/postos/listar",
+              "host": ["{{base_url}}"],
+              "path": ["api", "postos", "listar"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Postos Próximos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/postos/proximos?latitude=-23.5505&longitude=-46.6333&raio=5",
+              "host": ["{{base_url}}"],
+              "path": ["api", "postos", "proximos"],
+              "query": [
+                {
+                  "key": "latitude",
+                  "value": "-23.5505"
+                },
+                {
+                  "key": "longitude",
+                  "value": "-46.6333"
+                },
+                {
+                  "key": "raio",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Postos por Área (Bounding Box)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/postos/area?latMin=-23.6&latMax=-23.5&lngMin=-46.7&lngMax=-46.6&limit=100",
+              "host": ["{{base_url}}"],
+              "path": ["api", "postos", "area"],
+              "query": [
+                {
+                  "key": "latMin",
+                  "value": "-23.6"
+                },
+                {
+                  "key": "latMax",
+                  "value": "-23.5"
+                },
+                {
+                  "key": "lngMin",
+                  "value": "-46.7"
+                },
+                {
+                  "key": "lngMax",
+                  "value": "-46.6"
+                },
+                {
+                  "key": "limit",
+                  "value": "100"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Posto por ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/postos/{{posto_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "postos", "{{posto_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cadastrar Posto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Posto Teste\",\n  \"endereco\": \"Rua Teste, 123\",\n  \"latitude\": -23.5505,\n  \"longitude\": -46.6333,\n  \"telefone\": \"(11) 1234-5678\",\n  \"aberto_24h\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/postos/cadastrar",
+              "host": ["{{base_url}}"],
+              "path": ["api", "postos", "cadastrar"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Editar Posto",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Posto Atualizado\",\n  \"endereco\": \"Rua Nova, 456\",\n  \"telefone\": \"(11) 9876-5432\",\n  \"aberto_24h\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/postos/editar/{{posto_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "postos", "editar", "{{posto_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar Posto",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/postos/deletar/{{posto_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "postos", "deletar", "{{posto_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "💰 Preços",
+      "item": [
+        {
+          "name": "Atualizar Preço",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"posto_id\": 1,\n  \"tipo_combustivel\": \"Gasolina Comum\",\n  \"preco\": 5.49,\n  \"usuario_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/precos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "precos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Preço (Navegação)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"posto_id\": 1,\n  \"tipo_combustivel\": \"Gasolina Comum\",\n  \"preco\": 5.49,\n  \"usuario_id\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/precos/atualizar",
+              "host": ["{{base_url}}"],
+              "path": ["api", "precos", "atualizar"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Preços de um Posto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/precos/posto/{{posto_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "precos", "posto", "{{posto_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "⭐ Favoritos",
+      "item": [
+        {
+          "name": "Listar Favoritos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/favoritos/listar?usuario_id={{usuario_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "favoritos", "listar"],
+              "query": [
+                {
+                  "key": "usuario_id",
+                  "value": "{{usuario_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Adicionar Favorito",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario_id\": 1,\n  \"posto_id\": 1,\n  \"combustivel_preferido\": \"Gasolina Comum\",\n  \"preco_alvo\": 5.00,\n  \"notificar_sempre\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/favoritos/adicionar",
+              "host": ["{{base_url}}"],
+              "path": ["api", "favoritos", "adicionar"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remover Favorito",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/favoritos/remover/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "favoritos", "remover", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Favorito",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"combustivel_preferido\": \"Gasolina Aditivada\",\n  \"preco_alvo\": 5.50,\n  \"notificar_sempre\": false\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/favoritos/atualizar/1",
+              "host": ["{{base_url}}"],
+              "path": ["api", "favoritos", "atualizar", "1"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verificar se é Favorito",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/favoritos/verificar?usuario_id={{usuario_id}}&posto_id={{posto_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "favoritos", "verificar"],
+              "query": [
+                {
+                  "key": "usuario_id",
+                  "value": "{{usuario_id}}"
+                },
+                {
+                  "key": "posto_id",
+                  "value": "{{posto_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Histórico de Preços",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/favoritos/historico?posto_id={{posto_id}}&tipo_combustivel=Gasolina Comum&dias=30",
+              "host": ["{{base_url}}"],
+              "path": ["api", "favoritos", "historico"],
+              "query": [
+                {
+                  "key": "posto_id",
+                  "value": "{{posto_id}}"
+                },
+                {
+                  "key": "tipo_combustivel",
+                  "value": "Gasolina Comum"
+                },
+                {
+                  "key": "dias",
+                  "value": "30"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verificar Quedas de Preço",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/favoritos/verificar-quedas",
+              "host": ["{{base_url}}"],
+              "path": ["api", "favoritos", "verificar-quedas"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "⭐ Avaliações",
+      "item": [
+        {
+          "name": "Avaliar Posto",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"posto_id\": 1,\n  \"usuario_id\": 1,\n  \"nota\": 5,\n  \"comentario\": \"Excelente atendimento!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/avaliacoes",
+              "host": ["{{base_url}}"],
+              "path": ["api", "avaliacoes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Avaliações de um Posto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/avaliacoes/posto/{{posto_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "avaliacoes", "posto", "{{posto_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obter Média de um Posto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/avaliacoes/posto/{{posto_id}}/media",
+              "host": ["{{base_url}}"],
+              "path": ["api", "avaliacoes", "posto", "{{posto_id}}", "media"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obter Avaliação de Usuário",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/avaliacoes/posto/{{posto_id}}/usuario/{{usuario_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "avaliacoes", "posto", "{{posto_id}}", "usuario", "{{usuario_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar Avaliação",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/avaliacoes/posto/{{posto_id}}/usuario/{{usuario_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "avaliacoes", "posto", "{{posto_id}}", "usuario", "{{usuario_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📸 Fotos",
+      "item": [
+        {
+          "name": "Upload de Foto",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "foto",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "posto_id",
+                  "value": "1",
+                  "type": "text"
+                },
+                {
+                  "key": "usuario_id",
+                  "value": "1",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/fotos",
+              "host": ["{{base_url}}"],
+              "path": ["api", "fotos"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Fotos de um Posto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/fotos/posto/{{posto_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "fotos", "posto", "{{posto_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Contar Fotos de um Posto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/fotos/posto/{{posto_id}}/count",
+              "host": ["{{base_url}}"],
+              "path": ["api", "fotos", "posto", "{{posto_id}}", "count"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar Foto",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/fotos/1/usuario/{{usuario_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "fotos", "1", "usuario", "{{usuario_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔔 Notificações",
+      "item": [
+        {
+          "name": "Enviar Notificação de Teste",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"titulo\": \"Teste de Notificação\",\n  \"mensagem\": \"Esta é uma notificação de teste\",\n  \"device_token\": \"seu_device_token_aqui\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/notificacoes/enviar-teste",
+              "host": ["{{base_url}}"],
+              "path": ["api", "notificacoes", "enviar-teste"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📥 Importar Postos",
+      "item": [
+        {
+          "name": "Importar Postos por Região",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"latitude\": -23.5505,\n  \"longitude\": -46.6333,\n  \"raio\": 10000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/importar/importar-regiao",
+              "host": ["{{base_url}}"],
+              "path": ["api", "importar", "importar-regiao"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔧 Admin",
+      "item": [
+        {
+          "name": "Status do Sistema",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/admin/status",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "status"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

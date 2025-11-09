@@ -1,0 +1,49 @@
+{
+  "id": "postul-environment",
+  "name": "POSTUL API - Environment",
+  "values": [
+    {
+      "key": "base_url",
+      "value": "http://alabsv.ddns.net:3001",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "base_url_local",
+      "value": "http://localhost:3001",
+      "type": "default",
+      "enabled": false
+    },
+    {
+      "key": "usuario_id",
+      "value": "1",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "posto_id",
+      "value": "1",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "email_teste",
+      "value": "teste@exemplo.com",
+      "type": "default",
+      "enabled": true
+    },
+    {
+      "key": "senha_teste",
+      "value": "senha123",
+      "type": "secret",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment"
+}
