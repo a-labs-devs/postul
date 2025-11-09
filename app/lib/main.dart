@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:provider/provider.dart';
 import 'services/auth_service.dart';
+import 'services/ads_service.dart'; // 💰 AdMob
 import 'screens/tela_mapa.dart';
 import 'models/usuario.dart';
 import 'theme/theme_provider.dart';
@@ -26,6 +27,11 @@ Future<void> main() async {
 
     // REMOVIDO: Firebase (você não precisa dele para notificações locais)
     // await Firebase.initializeApp();
+    
+    // 💰 Inicializar AdMob
+    print('💰 Inicializando Google AdMob...');
+    await AdsService().initialize();
+    print('✅ AdMob pronto!');
 
     // TEMPORARIAMENTE DESABILITADO: Inicializar serviço de notificações locais
     // await NotificacaoProximidadeService.inicializar();

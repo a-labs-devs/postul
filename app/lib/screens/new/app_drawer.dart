@@ -4,6 +4,7 @@ import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 import '../../routes/routes.dart';
 import '../../services/perfil_service.dart';
+import '../../services/ads_service.dart';
 
 /// 📱 POSTUL - Menu Lateral (Drawer)
 class AppDrawer extends StatefulWidget {
@@ -158,6 +159,7 @@ class _AppDrawerState extends State<AppDrawer> {
               title: "Favoritos",
               onTap: () {
                 Navigator.pop(context);
+                AdsService().showInterstitialAdWithFrequency();
                 Navigator.pushNamed(context, AppRoutes.favoritos);
               },
             ),

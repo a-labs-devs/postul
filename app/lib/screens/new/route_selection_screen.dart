@@ -4,6 +4,7 @@ import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 import '../../models/posto.dart';
 import '../../services/rotas_service.dart';
+import '../../services/ads_service.dart';
 import '../../routes/app_routes.dart';
 import '../../routes/app_router.dart';
 
@@ -204,6 +205,7 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
 
     final selectedRoute = _routes[_selectedRouteIndex!];
     
+    AdsService().showInterstitialAdWithFrequency();
     Navigator.pushReplacementNamed(
       context,
       AppRoutes.navigation,

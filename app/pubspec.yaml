@@ -32,6 +32,9 @@ dependencies:
   # Notificações locais (sem Firebase!)
   flutter_local_notifications: ^17.2.3
   
+  # 💰 Google AdMob - Monetização
+  google_mobile_ads: ^5.1.0
+  
 
 dev_dependencies:
   flutter_test:

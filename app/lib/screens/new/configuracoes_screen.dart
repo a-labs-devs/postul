@@ -11,6 +11,7 @@ import '../../widgets/modals/custom_snackbar.dart';
 import '../../routes/app_routes.dart';
 import '../../services/perfil_service.dart';
 import '../../services/auth_service.dart';
+import '../../services/ads_service.dart';
 
 /// ⚙️ Tela de Configurações
 /// Interface de configurações e preferências do usuário
@@ -319,6 +320,128 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
               icon: Icons.radar,
             ),
           ],
+
+          _buildDivider(),
+
+          // ===== PREMIUM =====
+          _buildSectionHeader('Premium', Icons.star),
+          
+          // Card Premium com Rewarded Ad
+          Container(
+            margin: EdgeInsets.symmetric(
+              horizontal: AppSpacing.space16,
+              vertical: AppSpacing.space8,
+            ),
+            padding: EdgeInsets.all(AppSpacing.space20),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.primary,
+                  AppColors.primary.withOpacity(0.7),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(AppRadius.card),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(AppSpacing.space12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(AppRadius.button),
+                      ),
+                      child: const Icon(
+                        Icons.star_rounded,
+                        color: Colors.white,
+                        size: 32,
+                      ),
+                    ),
+                    SizedBox(width: AppSpacing.space16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'POSTUL Premium',
+                            style: AppTypography.headlineSmall.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: AppSpacing.space4),
+                          Text(
+                            'Ganhe 7 dias grátis!',
+                            style: AppTypography.bodyMedium.copyWith(
+                              color: Colors.white.withOpacity(0.9),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                
+                SizedBox(height: AppSpacing.space16),
+                
+                // Benefícios
+                _buildPremiumBenefit('Sem anúncios por 7 dias'),
+                _buildPremiumBenefit('Rotas ilimitadas'),
+                _buildPremiumBenefit('Suporte prioritário'),
+                
+                SizedBox(height: AppSpacing.space20),
+                
+                // Botão para assistir anúncio
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      AdsService().showRewardedAd(
+                        onRewarded: () {
+                          // TODO: Implementar lógica de Premium (salvar data de expiração)
+                          CustomSnackbar.show(
+                            context,
+                            message: '🎉 Premium ativado por 7 dias!',
+                            type: SnackbarType.success,
+                          );
+                        },
+                      );
+                    },
+                    icon: const Icon(Icons.play_circle_outline, size: 24),
+                    label: const Text(
+                      'Assistir vídeo e ganhar Premium',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: AppColors.primary,
+                      padding: EdgeInsets.symmetric(
+                        vertical: AppSpacing.space16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.button),
+                      ),
+                      elevation: 4,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
 
           _buildDivider(),
 
@@ -693,6 +816,29 @@ class _ConfiguracoesScreenState extends State<ConfiguracoesScreen> {
       height: AppSpacing.space32,
       thickness: 1,
       color: AppColors.outline.withValues(alpha: 0.2),
+    );
+  }
+
+  /// Widget para benefício Premium
+  Widget _buildPremiumBenefit(String text) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: AppSpacing.space8),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.check_circle,
+            color: Colors.white,
+            size: 20,
+          ),
+          SizedBox(width: AppSpacing.space12),
+          Text(
+            text,
+            style: AppTypography.bodyMedium.copyWith(
+              color: Colors.white.withOpacity(0.95),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
