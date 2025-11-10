@@ -1,0 +1,12 @@
+🎉 Primeira versão do POSTUL!
+
+Encontre os postos de gasolina mais próximos e com os melhores preços.
+
+✨ Destaques:
+• Mapa interativo com postos próximos
+• Comparação de preços em tempo real
+• Navegação integrada
+• Sistema de favoritos
+• Interface moderna
+
+💰 Economize combustível!
