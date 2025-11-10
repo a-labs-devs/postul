@@ -289,12 +289,15 @@ class _MapScreenState extends State<MapScreen> {
 
       // Calcular distância de cada posto até o usuário
       final postosComDistancia = postos.map((posto) {
-        final distancia = Geolocator.distanceBetween(
-          _userLocation.latitude,
-          _userLocation.longitude,
-          posto.latitude,
-          posto.longitude,
-        ) / 1000; // Converter metros para km
+        final distancia = _userLocation != null 
+          ? Geolocator.distanceBetween(
+              _userLocation!.latitude,
+              _userLocation!.longitude,
+              posto.latitude,
+              posto.longitude,
+            )
+          : 0.0;
+        final distanciaKm = distancia / 1000; // Converter metros para km
         
         return models.Posto(
           id: posto.id,
@@ -305,7 +308,7 @@ class _MapScreenState extends State<MapScreen> {
           telefone: posto.telefone,
           aberto24h: posto.aberto24h,
           precos: posto.precos,
-          distancia: distancia,
+          distancia: distanciaKm,
         );
       }).toList();
 
@@ -375,14 +378,16 @@ class _MapScreenState extends State<MapScreen> {
     final Set<google_maps.Marker> markers = {};
 
     // Marcador do usuário
-    markers.add(
-      google_maps.Marker(
-        markerId: const google_maps.MarkerId('user_location'),
-        position: google_maps.LatLng(_userLocation.latitude, _userLocation.longitude),
-        icon: _userMarkerIcon ?? google_maps.BitmapDescriptor.defaultMarkerWithHue(google_maps.BitmapDescriptor.hueRed),
-        anchor: const Offset(0.5, 0.5),
-      ),
-    );
+    if (_userLocation != null) {
+      markers.add(
+        google_maps.Marker(
+          markerId: const google_maps.MarkerId('user_location'),
+          position: google_maps.LatLng(_userLocation!.latitude, _userLocation!.longitude),
+          icon: _userMarkerIcon ?? google_maps.BitmapDescriptor.defaultMarkerWithHue(google_maps.BitmapDescriptor.hueRed),
+          anchor: const Offset(0.5, 0.5),
+        ),
+      );
+    }
 
     print('📍 Mostrando ${_postos.length} postos no mapa');
 
@@ -514,14 +519,16 @@ class _MapScreenState extends State<MapScreen> {
     // Atualizar localização antes de centralizar
     await _obterLocalizacaoReal();
     
-    _mapController?.animateCamera(
-      google_maps.CameraUpdate.newCameraPosition(
-        google_maps.CameraPosition(
-          target: google_maps.LatLng(_userLocation.latitude, _userLocation.longitude),
-          zoom: 15,
+    if (_userLocation != null) {
+      _mapController?.animateCamera(
+        google_maps.CameraUpdate.newCameraPosition(
+          google_maps.CameraPosition(
+            target: google_maps.LatLng(_userLocation!.latitude, _userLocation!.longitude),
+            zoom: 15,
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
   @override
@@ -538,11 +545,13 @@ class _MapScreenState extends State<MapScreen> {
               // Carregar postos assim que o mapa estiver pronto
               _carregarPostos();
             },
-              initialCameraPosition: google_maps.CameraPosition(
-                target: google_maps.LatLng(_userLocation.latitude, _userLocation.longitude),
-                zoom: 15,
-              ),
-              markers: _markers,
+            initialCameraPosition: google_maps.CameraPosition(
+              target: _userLocation != null 
+                ? google_maps.LatLng(_userLocation!.latitude, _userLocation!.longitude)
+                : const google_maps.LatLng(-23.5505, -46.6333), // São Paulo default
+              zoom: 15,
+            ),
+            markers: _markers,
               myLocationEnabled: true, // ✅ Ativado para mostrar localização real
               myLocationButtonEnabled: false, // Botão customizado
               zoomControlsEnabled: false,

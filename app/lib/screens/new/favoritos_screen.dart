@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 import '../../models/posto.dart';
@@ -38,10 +40,11 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
     });
     
     try {
-      // Obter usuário logado
-      final usuario = await _authService.usuarioAtual();
+      // Obter token e extrair usuarioId
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('auth_token');
       
-      if (usuario == null) {
+      if (token == null) {
         setState(() {
           _erro = 'Usuário não autenticado';
           _isLoading = false;
@@ -49,10 +52,25 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
         return;
       }
 
-      print('📱 Carregando favoritos do usuário ${usuario.id}...');
+      // Decodificar token JWT para obter o usuarioId
+      final parts = token.split('.');
+      if (parts.length != 3) {
+        setState(() {
+          _erro = 'Token inválido';
+          _isLoading = false;
+        });
+        return;
+      }
+
+      final payload = json.decode(
+        utf8.decode(base64Url.decode(base64Url.normalize(parts[1])))
+      );
+      final usuarioId = payload['usuarioId'] as int;
+
+      print('📱 Carregando favoritos do usuário $usuarioId...');
       
       // Buscar favoritos da API
-      final favoritos = await _favoritosService.listar(usuario.id);
+      final favoritos = await _favoritosService.listar(usuarioId);
       
       print('✅ ${favoritos.length} favoritos carregados');
       
@@ -66,7 +84,7 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
           longitude: fav.longitude ?? 0,
           telefone: fav.telefone,
           aberto24h: fav.aberto24h ?? false,
-          precos: fav.precos?.map((p) => p.toJson()).toList(),
+          precos: fav.precos,
           distancia: null,
         );
       }).toList();
@@ -111,9 +129,8 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
                         
                         // Extrair preço do combustível preferido (se disponível)
                         double? preco;
-                        if (posto.precos != null && posto.precos is List && (posto.precos as List).isNotEmpty) {
-                          final precoData = (posto.precos as List).first;
-                          preco = double.tryParse(precoData['preco']?.toString() ?? '0');
+                        if (posto.precos != null && posto.precos!.isNotEmpty) {
+                          preco = posto.precos!.first.preco;
                         }
                         
                         return Padding(
@@ -121,7 +138,7 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
                           child: PostoFavoritoCard(
                             nome: posto.nome,
                             endereco: posto.endereco,
-                            preco: preco,
+                            preco: preco ?? 0.0,
                             distancia: posto.distancia ?? 0,
                             combustivelPreferido: "Gasolina",
                             onNavigate: () => _navigateTo(posto),
@@ -256,10 +273,11 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
             Navigator.pop(context);
             
             try {
-              // Obter usuário logado
-              final usuario = await _authService.usuarioAtual();
+              // Obter token e extrair usuarioId
+              final prefs = await SharedPreferences.getInstance();
+              final token = prefs.getString('auth_token');
               
-              if (usuario == null) {
+              if (token == null) {
                 CustomSnackbar.show(
                   context,
                   message: "Usuário não autenticado",
@@ -268,8 +286,15 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
                 return;
               }
 
+              // Decodificar token para obter usuarioId
+              final parts = token.split('.');
+              final payload = json.decode(
+                utf8.decode(base64Url.decode(base64Url.normalize(parts[1])))
+              );
+              final usuarioId = payload['usuarioId'] as int;
+
               // Remover da API
-              final sucesso = await _favoritosService.removerPorUsuarioEPosto(usuario.id, posto.id);
+              final sucesso = await _favoritosService.removerPorUsuarioEPosto(usuarioId, posto.id);
               
               if (sucesso) {
                 // Remover da lista local

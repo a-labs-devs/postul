@@ -24,7 +24,7 @@ android {
     defaultConfig {
         applicationId = "com.alabsv.postul"
         minSdk = flutter.minSdkVersion
-        targetSdk = 34
+        targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         multiDexEnabled = true
@@ -65,5 +65,9 @@ flutter {
 
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
-    implementation("com.google.android.play:core:1.10.3")
+    // Play Core moderno compatível com SDK 35
+    implementation("com.google.android.play:app-update:2.1.0")
+    implementation("com.google.android.play:review:2.0.1")
+    implementation("com.google.android.play:feature-delivery:2.1.0")
+    implementation("com.google.android.gms:play-services-tasks:18.1.0")
 }
