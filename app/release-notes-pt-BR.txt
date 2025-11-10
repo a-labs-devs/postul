@@ -1,0 +1,40 @@
+📍 POSTUL - Versão 1.0.0
+
+🎉 Lançamento Inicial
+
+Encontre os postos de gasolina mais próximos e com os melhores preços!
+
+✨ Recursos Principais:
+
+🗺️ Mapa Interativo
+• Visualize todos os postos próximos em tempo real
+• Localização automática via GPS
+• Navegação integrada com Google Maps ou Waze
+
+💰 Comparação de Preços
+• Veja os preços de Gasolina, Etanol e Diesel
+• Compare preços entre postos vizinhos
+• Encontre o melhor custo-benefício
+
+⭐ Favoritos
+• Salve seus postos preferidos
+• Acesso rápido aos seus favoritos
+• Sincronização na nuvem
+
+📱 Funcionalidades:
+• Filtro por tipo de combustível
+• Ordenação por distância ou preço
+• Informações detalhadas de cada posto
+• Lista organizada de postos próximos
+• Interface moderna e intuitiva
+• Modo escuro disponível
+
+🔐 Segurança e Privacidade:
+• Cadastro com e-mail e senha
+• Recuperação de senha via código
+• Dados protegidos e criptografados
+• Política de privacidade transparente
+
+🚀 Economize combustível encontrando o melhor preço perto de você!
+
+Feedback? Entre em contato: suporte@alabsv.com.br

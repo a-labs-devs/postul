@@ -50,9 +50,32 @@
 -keepattributes SourceFile,LineNumberTable
 -keepattributes *Annotation*
 
+# Play Core para Flutter deferred components (compatível com SDK 34)
+-keep class com.google.android.play.core.** { *; }
+-dontwarn com.google.android.play.core.**
+-keep class io.flutter.embedding.engine.deferredcomponents.** { *; }
+-keep class io.flutter.embedding.android.FlutterPlayStoreSplitApplication { *; }
+
+# Google Play Services
+-keep class com.google.android.gms.** { *; }
+-dontwarn com.google.android.gms.**
+
+# Manter classes de reflection e serialização
+-keepattributes Signature
+-keepattributes *Annotation*
+-keepattributes EnclosingMethod
+-keepattributes InnerClasses
+
+# Manter enums
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
 # Remover logs em produção
 -assumenosideeffects class android.util.Log {
     public static *** d(...);
     public static *** v(...);
     public static *** i(...);
 }
+
