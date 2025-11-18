@@ -1,43 +1,34 @@
 ﻿#!/bin/bash
-# Auto-Deploy - Executado pelo Webhook no WSL
-# Atualiza o código sem reiniciar o servidor
+# Auto-Deploy - Git Pull e NPM Install
 
-# Diretório do script
-SCRIPT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
-cd "$SCRIPT_DIR"
+cd /mnt/c/Users/Administrator/Documents/GitHub/postul/backend
 
-LOG_FILE="/tmp/postul-deploy.log"
+echo "=== Auto-Deploy Iniciado ==="
+echo "Diretório: $(pwd)"
+echo ""
 
-{
-    echo "==================================="
-    echo "Auto-Deploy - $(date)"
-    echo "==================================="
-    
-    echo "[1/2] Git pull..."
-    git pull origin main
-    
-    if [ $? -eq 0 ]; then
-        echo "Git pull concluído com sucesso"
-    else
-        echo "Erro no git pull"
-        exit 1
-    fi
-    
-    echo "[2/2] NPM install..."
-    npm install --silent
-    
-    if [ $? -eq 0 ]; then
-        echo "NPM install concluído com sucesso"
-    else
-        echo "Erro no npm install"
-        exit 1
-    fi
-    
-    echo "==================================="
-    echo "Deploy concluído com sucesso!"
-    echo "==================================="
-    
-} >> "$LOG_FILE" 2>&1
+echo "[1/2] Git pull..."
+git pull origin main
+PULL_STATUS=$?
 
-# Mostra o resultado no console também
-tail -n 20 "$LOG_FILE"
+if [ $PULL_STATUS -eq 0 ]; then
+    echo "Git pull concluído"
+else
+    echo "Erro no git pull (código: $PULL_STATUS)"
+    exit 1
+fi
+
+echo ""
+echo "[2/2] NPM install..."
+npm install
+INSTALL_STATUS=$?
+
+if [ $INSTALL_STATUS -eq 0 ]; then
+    echo "NPM install concluído"
+else
+    echo "Erro no npm install (código: $INSTALL_STATUS)"
+    exit 1
+fi
+
+echo ""
+echo "=== Deploy Concluído com Sucesso ==="
