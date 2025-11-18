@@ -1,10 +1,10 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/usuario.dart';
 
 class AuthService {
-  // IMPORTANTE: Use o domínio DDNS com port forwarding
+  // IMPORTANTE: Use o domÃ­nio DDNS com port forwarding
   static const String baseUrl = 'http://alabsv.ddns.net:3001/api/auth';
   // static const String baseUrl = 'http://192.168.1.2:3001/api/auth';
   Future<Map<String, dynamic>> cadastrar({
@@ -42,7 +42,7 @@ class AuthService {
     } catch (e) {
       return {
         'sucesso': false,
-        'mensagem': 'Erro de conexão: $e',
+        'mensagem': 'Erro de conexÃ£o: $e',
       };
     }
   }
@@ -81,7 +81,7 @@ class AuthService {
     } catch (e) {
       return {
         'sucesso': false,
-        'mensagem': 'Erro de conexão: $e',
+        'mensagem': 'Erro de conexÃ£o: $e',
       };
     }
   }
@@ -104,13 +104,13 @@ class AuthService {
     await prefs.remove('token');
   }
 
-  // Verificar se está logado
+  // Verificar se estÃ¡ logado
   Future<bool> estaLogado() async {
     final token = await obterToken();
     return token != null;
   }
 
-  // Verificar se token é válido
+  // Verificar se token Ã© vÃ¡lido
   Future<Map<String, dynamic>> verificarToken() async {
     try {
       final token = await obterToken();
@@ -118,7 +118,7 @@ class AuthService {
       if (token == null) {
         return {
           'sucesso': false,
-          'mensagem': 'Token não encontrado',
+          'mensagem': 'Token nÃ£o encontrado',
         };
       }
 
@@ -140,18 +140,18 @@ class AuthService {
       } else {
         return {
           'sucesso': false,
-          'mensagem': data['mensagem'] ?? 'Token inválido',
+          'mensagem': data['mensagem'] ?? 'Token invÃ¡lido',
         };
       }
     } catch (e) {
       return {
         'sucesso': false,
-        'mensagem': 'Erro de conexão: $e',
+        'mensagem': 'Erro de conexÃ£o: $e',
       };
     }
   }
 
-  // 🔑 Solicitar recuperação de senha
+  // ðŸ”‘ Solicitar recuperaÃ§Ã£o de senha
   Future<Map<String, dynamic>> solicitarRecuperacao({
     required String email,
   }) async {
@@ -174,18 +174,18 @@ class AuthService {
       } else {
         return {
           'sucesso': false,
-          'mensagem': data['mensagem'] ?? 'Erro ao solicitar recuperação',
+          'mensagem': data['mensagem'] ?? 'Erro ao solicitar recuperaÃ§Ã£o',
         };
       }
     } catch (e) {
       return {
         'sucesso': false,
-        'mensagem': 'Erro de conexão: $e',
+        'mensagem': 'Erro de conexÃ£o: $e',
       };
     }
   }
 
-  // 🔑 Validar código de recuperação
+  // ðŸ”‘ Validar cÃ³digo de recuperaÃ§Ã£o
   Future<Map<String, dynamic>> validarCodigo({
     required String email,
     required String codigo,
@@ -210,18 +210,18 @@ class AuthService {
       } else {
         return {
           'sucesso': false,
-          'mensagem': data['mensagem'] ?? 'Código inválido',
+          'mensagem': data['mensagem'] ?? 'CÃ³digo invÃ¡lido',
         };
       }
     } catch (e) {
       return {
         'sucesso': false,
-        'mensagem': 'Erro de conexão: $e',
+        'mensagem': 'Erro de conexÃ£o: $e',
       };
     }
   }
 
-  // 🔑 Redefinir senha
+  // ðŸ”‘ Redefinir senha
   Future<Map<String, dynamic>> redefinirSenha({
     required String email,
     required String codigo,
@@ -254,7 +254,7 @@ class AuthService {
     } catch (e) {
       return {
         'sucesso': false,
-        'mensagem': 'Erro de conexão: $e',
+        'mensagem': 'Erro de conexÃ£o: $e',
       };
     }
   }

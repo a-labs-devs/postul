@@ -1,8 +1,6 @@
-import 'dart:convert';
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 import '../../models/posto.dart';
@@ -12,7 +10,7 @@ import '../../services/auth_service.dart';
 import '../../routes/app_routes.dart';
 import '../../routes/app_router.dart';
 
-/// ⭐ POSTUL - Tela de Favoritos
+/// â­ POSTUL - Tela de Favoritos
 class FavoritosScreen extends StatefulWidget {
   const FavoritosScreen({Key? key}) : super(key: key);
 
@@ -40,46 +38,30 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
     });
     
     try {
-      // Obter token e extrair usuarioId
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('auth_token');
+      // Obter usuÃ¡rio logado
+      final usuario = await _authService.usuarioAtual();
       
-      if (token == null) {
+      if (usuario == null) {
         setState(() {
-          _erro = 'Usuário não autenticado';
+          _erro = 'UsuÃ¡rio nÃ£o autenticado';
           _isLoading = false;
         });
         return;
       }
 
-      // Decodificar token JWT para obter o usuarioId
-      final parts = token.split('.');
-      if (parts.length != 3) {
-        setState(() {
-          _erro = 'Token inválido';
-          _isLoading = false;
-        });
-        return;
-      }
-
-      final payload = json.decode(
-        utf8.decode(base64Url.decode(base64Url.normalize(parts[1])))
-      );
-      final usuarioId = payload['usuarioId'] as int;
-
-      print('📱 Carregando favoritos do usuário $usuarioId...');
+      print('ðŸ“± Carregando favoritos do usuÃ¡rio ${usuario.id}...');
       
       // Buscar favoritos da API
-      final favoritos = await _favoritosService.listar(usuarioId);
+      final favoritos = await _favoritosService.listar(usuario.id);
       
-      print('✅ ${favoritos.length} favoritos carregados');
+      print('âœ… ${favoritos.length} favoritos carregados');
       
       // Converter favoritos para lista de postos
       final List<Posto> postosList = favoritos.map((fav) {
         return Posto(
           id: fav.postoId,
           nome: fav.postoNome ?? 'Posto sem nome',
-          endereco: fav.postoEndereco ?? 'Endereço não disponível',
+          endereco: fav.postoEndereco ?? 'EndereÃ§o nÃ£o disponÃ­vel',
           latitude: fav.latitude ?? 0,
           longitude: fav.longitude ?? 0,
           telefone: fav.telefone,
@@ -94,7 +76,7 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      print('❌ Erro ao carregar favoritos: $e');
+      print('âŒ Erro ao carregar favoritos: $e');
       setState(() {
         _erro = 'Erro ao carregar favoritos: $e';
         _isLoading = false;
@@ -127,10 +109,11 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
                       itemBuilder: (context, index) {
                         final posto = _postos[index];
                         
-                        // Extrair preço do combustível preferido (se disponível)
+                        // Extrair preÃ§o do combustÃ­vel preferido (se disponÃ­vel)
                         double? preco;
-                        if (posto.precos != null && posto.precos!.isNotEmpty) {
-                          preco = posto.precos!.first.preco;
+                        if (posto.precos != null && posto.precos is List && (posto.precos as List).isNotEmpty) {
+                          final precoData = (posto.precos as List).first;
+                          preco = double.tryParse(precoData['preco']?.toString() ?? '0');
                         }
                         
                         return Padding(
@@ -209,7 +192,7 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
             ),
             SizedBox(height: AppSpacing.space8),
             Text(
-              'Adicione postos aos favoritos para\nacessá-los rapidamente',
+              'Adicione postos aos favoritos para\nacessÃ¡-los rapidamente',
               style: AppTypography.bodyMedium.copyWith(
                 color: AppColors.textTertiary,
               ),
@@ -228,7 +211,7 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
 
   void _navigateTo(Posto posto) async {
     try {
-      // Obter localização atual
+      // Obter localizaÃ§Ã£o atual
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
@@ -239,16 +222,16 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
           AppRoutes.navigation,
           arguments: NavigationArgs(
             posto,
-            LatLng(position.latitude, position.longitude), // Localização REAL
+            LatLng(position.latitude, position.longitude), // LocalizaÃ§Ã£o REAL
           ),
         );
       }
     } catch (e) {
-      print('Erro ao obter localização: $e');
+      print('Erro ao obter localizaÃ§Ã£o: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Não foi possível obter sua localização.'),
+            content: Text('NÃ£o foi possÃ­vel obter sua localizaÃ§Ã£o.'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -273,28 +256,20 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
             Navigator.pop(context);
             
             try {
-              // Obter token e extrair usuarioId
-              final prefs = await SharedPreferences.getInstance();
-              final token = prefs.getString('auth_token');
+              // Obter usuÃ¡rio logado
+              final usuario = await _authService.usuarioAtual();
               
-              if (token == null) {
+              if (usuario == null) {
                 CustomSnackbar.show(
                   context,
-                  message: "Usuário não autenticado",
+                  message: "UsuÃ¡rio nÃ£o autenticado",
                   type: SnackbarType.error,
                 );
                 return;
               }
 
-              // Decodificar token para obter usuarioId
-              final parts = token.split('.');
-              final payload = json.decode(
-                utf8.decode(base64Url.decode(base64Url.normalize(parts[1])))
-              );
-              final usuarioId = payload['usuarioId'] as int;
-
               // Remover da API
-              final sucesso = await _favoritosService.removerPorUsuarioEPosto(usuarioId, posto.id);
+              final sucesso = await _favoritosService.removerPorUsuarioEPosto(usuario.id, posto.id);
               
               if (sucesso) {
                 // Remover da lista local
@@ -313,7 +288,7 @@ class _FavoritosScreenState extends State<FavoritosScreen> {
                 );
               }
             } catch (e) {
-              print('❌ Erro ao remover favorito: $e');
+              print('âŒ Erro ao remover favorito: $e');
               CustomSnackbar.show(
                 context,
                 message: "Erro: $e",

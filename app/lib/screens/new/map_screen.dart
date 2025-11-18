@@ -1,4 +1,4 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' as google_maps;
 import 'package:latlong2/latlong.dart';
@@ -14,7 +14,7 @@ import '../../services/ads_service.dart';
 import 'app_drawer.dart';
 import 'posto_detail_bottom_sheet.dart';
 
-/// 🗺️ POSTUL - Tela Principal do Mapa
+/// ðŸ—ºï¸ POSTUL - Tela Principal do Mapa
 class MapScreen extends StatefulWidget {
   final int usuarioId;
 
@@ -32,7 +32,7 @@ class _MapScreenState extends State<MapScreen> {
   LatLng? _userLocation;
   LatLng? _mapCenter;
   double _mapZoom = 15.0;
-  bool _isLoading = false;  // Mudado para false para não bloquear o mapa
+  bool _isLoading = false;  // Mudado para false para nÃ£o bloquear o mapa
   TipoCombustivel? _filtroAtivo;
   double _raioKm = 5.0;
   google_maps.GoogleMapController? _mapController;
@@ -45,10 +45,10 @@ class _MapScreenState extends State<MapScreen> {
     super.initState();
     _criarIconesCustomizados();
     _obterLocalizacaoReal();
-    // Carregar postos do cache imediatamente (enquanto aguarda localização e mapa)
+    // Carregar postos do cache imediatamente (enquanto aguarda localizaÃ§Ã£o e mapa)
     _carregarPostosInicial();
     
-    // Mostrar dica sobre Premium após 3 segundos
+    // Mostrar dica sobre Premium apÃ³s 3 segundos
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
         _mostrarDicaPremium();
@@ -56,7 +56,7 @@ class _MapScreenState extends State<MapScreen> {
     });
   }
 
-  /// 💡 Mostrar dica sobre Premium
+  /// ðŸ’¡ Mostrar dica sobre Premium
   void _mostrarDicaPremium() {
     showDialog(
       context: context,
@@ -95,7 +95,7 @@ class _MapScreenState extends State<MapScreen> {
               ),
               SizedBox(height: AppSpacing.space16),
               const Text(
-                'Ganhe Premium Grátis!',
+                'Ganhe Premium GrÃ¡tis!',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 22,
@@ -105,7 +105,7 @@ class _MapScreenState extends State<MapScreen> {
               ),
               SizedBox(height: AppSpacing.space12),
               const Text(
-                'Assista um vídeo curto e ganhe 7 dias de Premium sem anúncios!',
+                'Assista um vÃ­deo curto e ganhe 7 dias de Premium sem anÃºncios!',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 15,
@@ -126,7 +126,7 @@ class _MapScreenState extends State<MapScreen> {
                         ),
                       ),
                       child: const Text(
-                        'Agora não',
+                        'Agora nÃ£o',
                         style: TextStyle(fontSize: 13),
                       ),
                     ),
@@ -137,12 +137,12 @@ class _MapScreenState extends State<MapScreen> {
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context); // Fecha o popup
-                        // Mostra o anúncio Rewarded diretamente
+                        // Mostra o anÃºncio Rewarded diretamente
                         AdsService().showRewardedAd(
                           onRewarded: () {
                             CustomSnackbar.show(
                               context,
-                              message: '🎉 Premium ativado por 7 dias!',
+                              message: 'ðŸŽ‰ Premium ativado por 7 dias!',
                               type: SnackbarType.success,
                             );
                           },
@@ -176,10 +176,10 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  /// 📍 Carregamento inicial de postos (tenta cache primeiro)
+  /// ðŸ“ Carregamento inicial de postos (tenta cache primeiro)
   Future<void> _carregarPostosInicial() async {
     try {
-      print('🚀 Carregando postos iniciais...');
+      print('ðŸš€ Carregando postos iniciais...');
       // Usa listarTodos que tem cache integrado
       final postos = await _postosService.listarTodos();
       
@@ -187,40 +187,40 @@ class _MapScreenState extends State<MapScreen> {
         setState(() {
           _postos = postos;
         });
-        print('✅ ${postos.length} postos carregados inicialmente');
+        print('âœ… ${postos.length} postos carregados inicialmente');
       }
     } catch (e) {
-      print('⚠️ Não foi possível carregar postos iniciais: $e');
-      // Não mostra erro aqui, pois o carregamento real acontecerá quando o mapa inicializar
+      print('âš ï¸ NÃ£o foi possÃ­vel carregar postos iniciais: $e');
+      // NÃ£o mostra erro aqui, pois o carregamento real acontecerÃ¡ quando o mapa inicializar
     }
   }
 
-  /// 📍 Obter localização real do GPS
+  /// ðŸ“ Obter localizaÃ§Ã£o real do GPS
   Future<void> _obterLocalizacaoReal() async {
     try {
-      // Verificar se o serviço de localização está habilitado
+      // Verificar se o serviÃ§o de localizaÃ§Ã£o estÃ¡ habilitado
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        print('⚠️ Serviço de localização desabilitado');
+        print('âš ï¸ ServiÃ§o de localizaÃ§Ã£o desabilitado');
         return;
       }
 
-      // Verificar permissões
+      // Verificar permissÃµes
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          print('⚠️ Permissão de localização negada');
+          print('âš ï¸ PermissÃ£o de localizaÃ§Ã£o negada');
           return;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        print('⚠️ Permissão de localização negada permanentemente');
+        print('âš ï¸ PermissÃ£o de localizaÃ§Ã£o negada permanentemente');
         return;
       }
 
-      // Obter posição atual
+      // Obter posiÃ§Ã£o atual
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
@@ -228,10 +228,10 @@ class _MapScreenState extends State<MapScreen> {
       setState(() {
         _userLocation = LatLng(position.latitude, position.longitude);
         _mapCenter = LatLng(position.latitude, position.longitude);
-        print('✅ Localização obtida: ${position.latitude}, ${position.longitude}');
+        print('âœ… LocalizaÃ§Ã£o obtida: ${position.latitude}, ${position.longitude}');
       });
 
-      // Centralizar mapa na localização real
+      // Centralizar mapa na localizaÃ§Ã£o real
       if (_mapController != null) {
         _mapController!.animateCamera(
           google_maps.CameraUpdate.newLatLng(
@@ -240,15 +240,15 @@ class _MapScreenState extends State<MapScreen> {
         );
       }
 
-      // Recarregar postos com a nova localização
+      // Recarregar postos com a nova localizaÃ§Ã£o
       _carregarPostos();
     } catch (e) {
-      print('❌ Erro ao obter localização: $e');
+      print('âŒ Erro ao obter localizaÃ§Ã£o: $e');
     }
   }
 
   void _criarIconesCustomizados() {
-    // Usar ícones padrão do Google Maps
+    // Usar Ã­cones padrÃ£o do Google Maps
     _customMarker = google_maps.BitmapDescriptor.defaultMarkerWithHue(
       google_maps.BitmapDescriptor.hueBlue,
     );
@@ -262,12 +262,12 @@ class _MapScreenState extends State<MapScreen> {
 
     try {
       if (_mapController == null) {
-        print('⚠️ MapController não está pronto ainda');
+        print('âš ï¸ MapController nÃ£o estÃ¡ pronto ainda');
         setState(() => _isLoading = false);
         return;
       }
       
-      // Obter bounds visíveis do mapa
+      // Obter bounds visÃ­veis do mapa
       final bounds = await _mapController!.getVisibleRegion();
       
       // Calcular bounding box
@@ -276,9 +276,9 @@ class _MapScreenState extends State<MapScreen> {
       final lngMin = bounds.southwest.longitude;
       final lngMax = bounds.northeast.longitude;
 
-      print('🗺️ Carregando postos na área: lat[$latMin, $latMax], lng[$lngMin, $lngMax]');
+      print('ðŸ—ºï¸ Carregando postos na Ã¡rea: lat[$latMin, $latMax], lng[$lngMin, $lngMax]');
 
-      // Buscar postos apenas na área visível
+      // Buscar postos apenas na Ã¡rea visÃ­vel
       final postos = await _postosService.buscarPorArea(
         latMin: latMin,
         latMax: latMax,
@@ -287,17 +287,14 @@ class _MapScreenState extends State<MapScreen> {
         limit: 100,
       );
 
-      // Calcular distância de cada posto até o usuário
+      // Calcular distÃ¢ncia de cada posto atÃ© o usuÃ¡rio
       final postosComDistancia = postos.map((posto) {
-        final distancia = _userLocation != null 
-          ? Geolocator.distanceBetween(
-              _userLocation!.latitude,
-              _userLocation!.longitude,
-              posto.latitude,
-              posto.longitude,
-            )
-          : 0.0;
-        final distanciaKm = distancia / 1000; // Converter metros para km
+        final distancia = Geolocator.distanceBetween(
+          _userLocation?.latitude ?? -23.5505,
+          _userLocation?.longitude ?? -46.6333,
+          posto.latitude,
+          posto.longitude,
+        ) / 1000; // Converter metros para km
         
         return models.Posto(
           id: posto.id,
@@ -308,7 +305,7 @@ class _MapScreenState extends State<MapScreen> {
           telefone: posto.telefone,
           aberto24h: posto.aberto24h,
           precos: posto.precos,
-          distancia: distanciaKm,
+          distancia: distancia,
         );
       }).toList();
 
@@ -319,20 +316,20 @@ class _MapScreenState extends State<MapScreen> {
       
       _criarMarcadores();
     } catch (e) {
-      print('❌ Erro ao carregar postos: $e');
+      print('âŒ Erro ao carregar postos: $e');
       
       setState(() => _isLoading = false);
       
-      // Notificar usuário sobre o erro com mensagem específica
+      // Notificar usuÃ¡rio sobre o erro com mensagem especÃ­fica
       if (mounted) {
         String mensagemErro = 'Erro ao carregar postos.';
         
         if (e.toString().contains('SocketException') || 
             e.toString().contains('Failed host lookup') ||
             e.toString().contains('TimeoutException')) {
-          mensagemErro = 'Sem conexão com o servidor. Verifique sua internet.';
+          mensagemErro = 'Sem conexÃ£o com o servidor. Verifique sua internet.';
         } else if (e.toString().contains('HTTP')) {
-          mensagemErro = 'Servidor indisponível no momento.';
+          mensagemErro = 'Servidor indisponÃ­vel no momento.';
         }
         
         ScaffoldMessenger.of(context).showSnackBar(
@@ -355,7 +352,7 @@ class _MapScreenState extends State<MapScreen> {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  'Os postos serão carregados quando a conexão for restabelecida.',
+                  'Os postos serÃ£o carregados quando a conexÃ£o for restabelecida.',
                   style: TextStyle(fontSize: 12, color: Colors.white70),
                 ),
               ],
@@ -377,21 +374,19 @@ class _MapScreenState extends State<MapScreen> {
   void _criarMarcadores() {
     final Set<google_maps.Marker> markers = {};
 
-    // Marcador do usuário
-    if (_userLocation != null) {
-      markers.add(
-        google_maps.Marker(
-          markerId: const google_maps.MarkerId('user_location'),
-          position: google_maps.LatLng(_userLocation!.latitude, _userLocation!.longitude),
-          icon: _userMarkerIcon ?? google_maps.BitmapDescriptor.defaultMarkerWithHue(google_maps.BitmapDescriptor.hueRed),
-          anchor: const Offset(0.5, 0.5),
-        ),
-      );
-    }
+    // Marcador do usuÃ¡rio
+    markers.add(
+      google_maps.Marker(
+        markerId: const google_maps.MarkerId('user_location'),
+        position: google_maps.LatLng(_userLocation?.latitude ?? -23.5505, _userLocation?.longitude ?? -46.6333),
+        icon: _userMarkerIcon ?? google_maps.BitmapDescriptor.defaultMarkerWithHue(google_maps.BitmapDescriptor.hueRed),
+        anchor: const Offset(0.5, 0.5),
+      ),
+    );
 
-    print('📍 Mostrando ${_postos.length} postos no mapa');
+    print('ðŸ“ Mostrando ${_postos.length} postos no mapa');
 
-    // Adicionar marcadores dos postos (já filtrados pelo backend)
+    // Adicionar marcadores dos postos (jÃ¡ filtrados pelo backend)
     for (var posto in _postos) {
       markers.add(
         google_maps.Marker(
@@ -401,7 +396,7 @@ class _MapScreenState extends State<MapScreen> {
           onTap: () => _showPostoDetail(posto),
           infoWindow: google_maps.InfoWindow(
             title: posto.nome,
-            snippet: posto.aberto24h ? '24h' : 'Horário comercial',
+            snippet: posto.aberto24h ? '24h' : 'HorÃ¡rio comercial',
           ),
         ),
       );
@@ -416,7 +411,7 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _onCameraIdle() {
-    // Recarregar postos da área visível quando o mapa parar de se mover
+    // Recarregar postos da Ã¡rea visÃ­vel quando o mapa parar de se mover
     _carregarPostos();
   }
 
@@ -430,7 +425,7 @@ class _MapScreenState extends State<MapScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Filtrar por combustível", style: AppTypography.titleLarge),
+            Text("Filtrar por combustÃ­vel", style: AppTypography.titleLarge),
             SizedBox(height: AppSpacing.space20),
             Wrap(
               spacing: AppSpacing.space12,
@@ -481,7 +476,7 @@ class _MapScreenState extends State<MapScreen> {
                 Text("Raio de busca", style: AppTypography.titleLarge),
                 SizedBox(height: AppSpacing.space20),
                 CustomSlider(
-                  label: "Distância",
+                  label: "DistÃ¢ncia",
                   value: tempRaio,
                   min: 1,
                   max: 20,
@@ -516,19 +511,17 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void _centerOnUserLocation() async {
-    // Atualizar localização antes de centralizar
+    // Atualizar localizaÃ§Ã£o antes de centralizar
     await _obterLocalizacaoReal();
     
-    if (_userLocation != null) {
-      _mapController?.animateCamera(
-        google_maps.CameraUpdate.newCameraPosition(
-          google_maps.CameraPosition(
-            target: google_maps.LatLng(_userLocation!.latitude, _userLocation!.longitude),
-            zoom: 15,
-          ),
+    _mapController?.animateCamera(
+      google_maps.CameraUpdate.newCameraPosition(
+        google_maps.CameraPosition(
+          target: google_maps.LatLng(_userLocation?.latitude ?? -23.5505, _userLocation?.longitude ?? -46.6333),
+          zoom: 15,
         ),
-      );
-    }
+      ),
+    );
   }
 
   @override
@@ -545,15 +538,13 @@ class _MapScreenState extends State<MapScreen> {
               // Carregar postos assim que o mapa estiver pronto
               _carregarPostos();
             },
-            initialCameraPosition: google_maps.CameraPosition(
-              target: _userLocation != null 
-                ? google_maps.LatLng(_userLocation!.latitude, _userLocation!.longitude)
-                : const google_maps.LatLng(-23.5505, -46.6333), // São Paulo default
-              zoom: 15,
-            ),
-            markers: _markers,
-              myLocationEnabled: true, // ✅ Ativado para mostrar localização real
-              myLocationButtonEnabled: false, // Botão customizado
+              initialCameraPosition: google_maps.CameraPosition(
+                target: google_maps.LatLng(_userLocation?.latitude ?? -23.5505, _userLocation?.longitude ?? -46.6333),
+                zoom: 15,
+              ),
+              markers: _markers,
+              myLocationEnabled: true, // âœ… Ativado para mostrar localizaÃ§Ã£o real
+              myLocationButtonEnabled: false, // BotÃ£o customizado
               zoomControlsEnabled: false,
               mapToolbarEnabled: false,
               onCameraMove: _onCameraMove,
@@ -598,7 +589,7 @@ class _MapScreenState extends State<MapScreen> {
                           ),
                         ),
                         const Spacer(),
-                        // Botão Premium
+                        // BotÃ£o Premium
                         Container(
                           margin: EdgeInsets.only(right: AppSpacing.space8),
                           decoration: BoxDecoration(
@@ -623,12 +614,12 @@ class _MapScreenState extends State<MapScreen> {
                               borderRadius: BorderRadius.circular(20),
                               onTap: () {
                                 Navigator.pushNamed(context, AppRoutes.configuracoes);
-                                // Mostrar dica após navegação
+                                // Mostrar dica apÃ³s navegaÃ§Ã£o
                                 Future.delayed(const Duration(milliseconds: 500), () {
                                   if (mounted) {
                                     CustomSnackbar.show(
                                       context,
-                                      message: '⭐ Role até "Premium" para ganhar 7 dias grátis!',
+                                      message: 'â­ Role atÃ© "Premium" para ganhar 7 dias grÃ¡tis!',
                                       type: SnackbarType.info,
                                     );
                                   }
@@ -706,7 +697,7 @@ class _MapScreenState extends State<MapScreen> {
             right: 16,
             child: CustomFAB.small(
               icon: Icons.my_location,
-              tooltip: "Minha localização",
+              tooltip: "Minha localizaÃ§Ã£o",
               onPressed: _centerOnUserLocation,
             ),
           ),
@@ -748,9 +739,9 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ),
 
-          // Botão "Ver lista de postos"
+          // BotÃ£o "Ver lista de postos"
           Positioned(
-            bottom: 52, // Totalmente colado no banner (50px altura + 2px margem mínima)
+            bottom: 52, // Totalmente colado no banner (50px altura + 2px margem mÃ­nima)
             left: 16,
             right: 16,
             child: Container(
@@ -774,7 +765,7 @@ class _MapScreenState extends State<MapScreen> {
             ),
           ),
 
-          // 💰 BANNER DE ANÚNCIO (rodapé)
+          // ðŸ’° BANNER DE ANÃšNCIO (rodapÃ©)
           if (AdsService().bannerAd != null)
             Positioned(
               bottom: 0,
