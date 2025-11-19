@@ -46,8 +46,8 @@ class AdsService {
 
   // ========== CONTROLE ==========
 
-  // 🧪 MODO TESTE - Para desenvolvimento e testes
-  bool _isTestMode = true;
+  // 🚀 MODO PRODUÇÃO - Anúncios reais ativos
+  bool _isTestMode = false;
 
   BannerAd? _bannerAd;
   InterstitialAd? _interstitialAd;

@@ -3,6 +3,7 @@ import '../../theme/theme.dart';
 import '../../widgets/widgets.dart';
 import '../../models/posto.dart';
 import '../../models/tipos_combustivel.dart';
+import '../../services/postos_service.dart';
 import 'posto_detail_bottom_sheet.dart';
 
 /// 📋 POSTUL - Tela de Lista de Postos
@@ -14,6 +15,7 @@ class ListaPostosScreen extends StatefulWidget {
 }
 
 class _ListaPostosScreenState extends State<ListaPostosScreen> {
+  final PostosService _postosService = PostosService();
   List<Posto> _postos = [];
   bool _isLoading = true;
   OrdenacaoTipo _ordenacaoAtual = OrdenacaoTipo.distancia;
@@ -29,26 +31,55 @@ class _ListaPostosScreenState extends State<ListaPostosScreen> {
   Future<void> _carregarPostos() async {
     setState(() => _isLoading = true);
     
-    // TODO: Implementar carregamento de postos da API
-    setState(() {
-      _postos = [];
-      _isLoading = false;
-    });
+    try {
+      final postos = await _postosService.listarTodos();
+      setState(() {
+        _postos = postos;
+        _isLoading = false;
+      });
+      print('✅ ${postos.length} postos carregados na lista');
+    } catch (e) {
+      print('❌ Erro ao carregar postos: $e');
+      setState(() {
+        _postos = [];
+        _isLoading = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao carregar postos: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   void _ordenarPor(OrdenacaoTipo tipo) {
     setState(() {
       _ordenacaoAtual = tipo;
-      // TODO: Implementar lógica de ordenação
+      
       switch (tipo) {
         case OrdenacaoTipo.distancia:
-          _postos.sort((a, b) => (a.distancia ?? 0).compareTo(b.distancia ?? 0));
+          _postos.sort((a, b) => (a.distancia ?? 999999).compareTo(b.distancia ?? 999999));
           break;
         case OrdenacaoTipo.preco:
-          // Ordenar por preço quando implementado
+          // Ordenar por menor preço de gasolina
+          _postos.sort((a, b) {
+            final precoA = a.precos?.firstWhere(
+              (p) => p.tipo.toLowerCase() == 'gasolina',
+              orElse: () => Preco(tipo: 'gasolina', preco: 999999, atualizadoEm: DateTime.now()),
+            ).preco ?? 999999;
+            final precoB = b.precos?.firstWhere(
+              (p) => p.tipo.toLowerCase() == 'gasolina',
+              orElse: () => Preco(tipo: 'gasolina', preco: 999999, atualizadoEm: DateTime.now()),
+            ).preco ?? 999999;
+            return precoA.compareTo(precoB);
+          });
           break;
         case OrdenacaoTipo.avaliacao:
-          // Ordenar por avaliação quando implementado
+          // Ordenar por avaliação (quando implementado)
+          _postos.sort((a, b) => 0); // Por enquanto, mantém ordem atual
           break;
         default:
           break;
