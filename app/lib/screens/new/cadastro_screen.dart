@@ -387,13 +387,13 @@ class _CadastroScreenState extends State<CadastroScreen> with SingleTickerProvid
 
                               SizedBox(height: AppSpacing.space24),
 
-                              // BOTÃO CADASTRAR
+                              // BOTÃO CADASTRAR - Responsivo
                               _PrimaryButtonWhite(
                                 label: "Criar conta",
                                 onPressed: _cadastrar,
                                 isLoading: _isLoading,
                                 width: double.infinity,
-                                height: 56,
+                                height: MediaQuery.of(context).size.height < 640 ? 48 : 56,
                               ),
 
                               SizedBox(height: AppSpacing.space16),

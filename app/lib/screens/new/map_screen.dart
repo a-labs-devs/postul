@@ -739,9 +739,11 @@ class _MapScreenState extends State<MapScreen> {
               ),
             ),
 
-          // BotÃ£o "Ver lista de postos"
+          // BotÃ£o "Ver lista de postos" - Responsivo
           Positioned(
-            bottom: 52, // Totalmente colado no banner (50px altura + 2px margem mÃ­nima)
+            bottom: AdsService().bannerAd != null 
+                ? AdsService().bannerAd!.size.height.toDouble() + 8 
+                : MediaQuery.of(context).padding.bottom + 16,
             left: 16,
             right: 16,
             child: Container(
@@ -760,7 +762,7 @@ class _MapScreenState extends State<MapScreen> {
                   );
                 },
                 width: double.infinity,
-                height: 56,
+                height: MediaQuery.of(context).size.height < 600 ? 48 : 56,
               ),
             ),
           ),

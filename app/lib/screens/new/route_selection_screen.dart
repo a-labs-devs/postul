@@ -339,11 +339,13 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
                         ),
                 ),
 
-                // BOTÃO INICIAR NAVEGAÇÃO
+                // BOTÃO INICIAR NAVEGAÇÃO - Responsivo
                 SafeArea(
                   top: false,
                   child: Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.all(
+                      MediaQuery.of(context).size.height < 600 ? 12 : 20,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       boxShadow: [
@@ -359,7 +361,7 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
                       icon: Icons.navigation,
                       onPressed: _startNavigation,
                       width: double.infinity,
-                      height: 56,
+                      height: MediaQuery.of(context).size.height < 600 ? 48 : 56,
                     ),
                   ),
                 ),
@@ -398,75 +400,88 @@ class _RouteSelectionScreenState extends State<RouteSelectionScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // HEADER
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: route.cor.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    route.icone,
-                    color: route.cor,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+            // HEADER - Responsivo
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isSmallScreen = constraints.maxWidth < 340;
+                return Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(isSmallScreen ? 8 : 10),
+                      decoration: BoxDecoration(
+                        color: route.cor.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(
+                        route.icone,
+                        color: route.cor,
+                        size: isSmallScreen ? 20 : 24,
+                      ),
+                    ),
+                    SizedBox(width: isSmallScreen ? 8 : 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            route.nome,
-                            style: AppTypography.titleMedium.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: isSelected ? route.cor : Colors.black,
-                            ),
-                          ),
-                          if (index == 0) ...[
-                            const SizedBox(width: 8),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.green,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Text(
-                                'RECOMENDADA',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
+                          Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  route.nome,
+                                  style: AppTypography.titleMedium.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: isSelected ? route.cor : Colors.black,
+                                    fontSize: isSmallScreen ? 14 : null,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
+                              if (index == 0) ...[
+                                SizedBox(width: isSmallScreen ? 4 : 8),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: isSmallScreen ? 6 : 8,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    isSmallScreen ? 'TOP' : 'RECOMENDADA',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: isSmallScreen ? 8 : 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            route.descricao,
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.textSecondary,
+                              fontSize: isSmallScreen ? 12 : null,
                             ),
-                          ],
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        route.descricao,
-                        style: AppTypography.bodySmall.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                    ),
+                    if (isSelected)
+                      Icon(
+                        Icons.check_circle,
+                        color: route.cor,
+                        size: isSmallScreen ? 24 : 28,
                       ),
-                    ],
-                  ),
-                ),
-                if (isSelected)
-                  Icon(
-                    Icons.check_circle,
-                    color: route.cor,
-                    size: 28,
-                  ),
-              ],
+                  ],
+                );
+              },
             ),
 
             const SizedBox(height: 16),

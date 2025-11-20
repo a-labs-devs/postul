@@ -239,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                   onPressed: _login,
                                   isLoading: _isLoading,
                                   width: double.infinity,
-                                  height: 56,
+                                  height: MediaQuery.of(context).size.height < 640 ? 48 : 56,
                                 ),
 
                                 SizedBox(height: AppSpacing.space16),

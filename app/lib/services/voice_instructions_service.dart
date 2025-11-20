@@ -222,11 +222,36 @@ class VoiceInstructionsService {
     if (streetName != null && streetName.isNotEmpty && distance > 50) {
       if (maneuver.type != ManeuverType.arrive && 
           maneuver.type != ManeuverType.straight) {
-        text += ' na $streetName';
+        // Limpar nome da rua antes de falar
+        final ruaClean = _limparNomeRua(streetName);
+        if (ruaClean.isNotEmpty) {
+          text += ' na $ruaClean';
+        }
       }
     }
 
     return text;
+  }
+
+  /// Limpar nome da rua removendo números e CEPs
+  String _limparNomeRua(String rua) {
+    // Remover CEP
+    String clean = rua.replaceAll(RegExp(r'\d{5}-?\d{3}'), '');
+    
+    // Remover números de endereço
+    clean = clean.replaceAll(RegExp(r',\s*\d+'), '');
+    clean = clean.replaceAll(RegExp(r'n[úu]mero\s*\d+', caseSensitive: false), '');
+    clean = clean.replaceAll(RegExp(r'n[°º]\s*\d+', caseSensitive: false), '');
+    
+    // Remover apenas números soltos
+    clean = clean.replaceAll(RegExp(r'\b\d+\b'), '');
+    
+    // Limpar espaços e vírgulas extras
+    clean = clean.replaceAll(RegExp(r'\s+'), ' ');
+    clean = clean.replaceAll(RegExp(r',\s*,'), ',');
+    clean = clean.replaceAll(RegExp(r'^\s*,\s*|\s*,\s*$'), '');
+    
+    return clean.trim();
   }
 
   /// Formatar distância em texto natural
@@ -262,7 +287,30 @@ class VoiceInstructionsService {
 
   /// Anunciar início da navegação
   Future<void> announceNavigationStart(String destinationName) async {
-    await speak('Iniciando navegação para $destinationName');
+    // Limpar nome do destino (remover CEP, números, etc)
+    final nomeClean = _limparNomeDestino(destinationName);
+    await speak('Iniciando navegação para $nomeClean');
+  }
+
+  /// Limpar nome do destino removendo CEP e números
+  String _limparNomeDestino(String nome) {
+    // Remover CEP (formato: 12345-678 ou 12345678)
+    String clean = nome.replaceAll(RegExp(r'\d{5}-?\d{3}'), '');
+    
+    // Remover números de endereço (ex: "123," ou "número 123")
+    clean = clean.replaceAll(RegExp(r',\s*\d+'), '');
+    clean = clean.replaceAll(RegExp(r'n[úu]mero\s*\d+', caseSensitive: false), '');
+    clean = clean.replaceAll(RegExp(r'n[°º]\s*\d+', caseSensitive: false), '');
+    
+    // Remover números soltos no final
+    clean = clean.replaceAll(RegExp(r'\s*\d+\s*$'), '');
+    
+    // Remover espaços extras e vírgulas duplicadas
+    clean = clean.replaceAll(RegExp(r'\s+'), ' ');
+    clean = clean.replaceAll(RegExp(r',\s*,'), ',');
+    clean = clean.replaceAll(RegExp(r',\s*$'), '');
+    
+    return clean.trim();
   }
 
   /// Anunciar recálculo de rota

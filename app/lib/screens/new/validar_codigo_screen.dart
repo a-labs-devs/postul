@@ -199,23 +199,25 @@ class _ValidarCodigoScreenState extends State<ValidarCodigoScreen> with SingleTi
 
                 SizedBox(height: AppSpacing.space48),
 
-                // ÍCONE
+                // ÍCONE - Responsivo
                 FadeTransition(
                   opacity: _fadeAnimation,
                   child: Container(
-                    width: 100,
-                    height: 100,
+                    width: MediaQuery.of(context).size.height < 640 ? 80 : 100,
+                    height: MediaQuery.of(context).size.height < 640 ? 80 : 100,
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(25),
+                      borderRadius: BorderRadius.circular(
+                        MediaQuery.of(context).size.height < 640 ? 20 : 25,
+                      ),
                       border: Border.all(
                         color: Colors.white.withOpacity(0.2),
                         width: 2,
                       ),
                     ),
-                    child: const Icon(
-                      Icons.mail_outline,
-                      size: 50,
+                    child: Icon(
+                      Icons.verified_user,
+                      size: MediaQuery.of(context).size.height < 640 ? 40 : 50,
                       color: Colors.white,
                     ),
                   ),

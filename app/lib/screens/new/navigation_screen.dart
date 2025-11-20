@@ -486,72 +486,81 @@ class _NavigationScreenState extends State<NavigationScreen> {
                         ),
                       ),
                     
-                    // ROW PRINCIPAL (MELHORADO)
-                    Padding(
-                      padding: const EdgeInsets.all(20),
-                      child: Row(
-                        children: [
-                          // ÍCONE GRANDE DA MANOBRA (MELHORADO)
-                          Container(
-                            width: 80,
-                            height: 80,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  AppColors.primary.withOpacity(0.15),
-                                  AppColors.primary.withOpacity(0.08),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
+                    // ROW PRINCIPAL (MELHORADO) - Responsivo
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final isSmallScreen = MediaQuery.of(context).size.width < 360;
+                        final iconSize = isSmallScreen ? 64.0 : 80.0;
+                        final iconPadding = isSmallScreen ? 16.0 : 20.0;
+                        final iconInnerSize = isSmallScreen ? 40.0 : 48.0;
+                        
+                        return Padding(
+                          padding: EdgeInsets.all(iconPadding),
+                          child: Row(
+                            children: [
+                              // ÍCONE GRANDE DA MANOBRA (MELHORADO)
+                              Container(
+                                width: iconSize,
+                                height: iconSize,
+                                decoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      AppColors.primary.withOpacity(0.15),
+                                      AppColors.primary.withOpacity(0.08),
+                                    ],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(isSmallScreen ? 12 : 16),
+                                  border: Border.all(
+                                    color: AppColors.primary.withOpacity(0.2),
+                                    width: 2,
+                                  ),
+                                ),
+                                child: Icon(
+                                  _getIconeManobra(),
+                                  size: iconInnerSize,
+                                  color: AppColors.primary,
+                                ),
                               ),
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(
-                                color: AppColors.primary.withOpacity(0.2),
-                                width: 2,
-                              ),
-                            ),
-                            child: Icon(
-                              _getIconeManobra(),
-                              size: 48,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                          const SizedBox(width: 20),
+                              SizedBox(width: isSmallScreen ? 12 : 20),
                           
-                          // INSTRUÇÃO E DISTÂNCIA (MELHORADO)
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // DISTÂNCIA EM METROS (DESTAQUE MAIOR)
-                                Text(
-                                  _formatarDistancia(_distanceToNextManeuver),
-                                  style: TextStyle(
-                                    fontSize: 36,
-                                    fontWeight: FontWeight.w900,
-                                    color: AppColors.primary,
-                                    height: 1.0,
-                                    letterSpacing: -0.5,
-                                  ),
+                              // INSTRUÇÃO E DISTÂNCIA (MELHORADO)
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // DISTÂNCIA EM METROS (DESTAQUE MAIOR)
+                                    Text(
+                                      _formatarDistancia(_distanceToNextManeuver),
+                                      style: TextStyle(
+                                        fontSize: isSmallScreen ? 28 : 36,
+                                        fontWeight: FontWeight.w900,
+                                        color: AppColors.primary,
+                                        height: 1.0,
+                                        letterSpacing: -0.5,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    // INSTRUÇÃO (MELHORADA)
+                                    Text(
+                                      _nextInstruction,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black87,
+                                        height: 1.3,
+                                      ),
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 6),
-                                // INSTRUÇÃO (MELHORADA)
-                                Text(
-                                  _nextInstruction,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black87,
-                                    height: 1.3,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -595,75 +604,92 @@ class _NavigationScreenState extends State<NavigationScreen> {
                         ),
                         const SizedBox(height: 20),
                         
-                        // INFO GRID MELHORADO (3 COLUNAS)
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildInfoCardWaze(
-                                value: _eta,
-                                label: 'Chegada',
-                                icon: Icons.schedule,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _buildInfoCardWaze(
-                                value: '${_remainingDistance.toStringAsFixed(1)} km',
-                                label: 'Distância',
-                                icon: Icons.route,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _buildInfoCardWaze(
-                                value: '${_currentSpeed.toStringAsFixed(0)} km/h',
-                                label: 'Velocidade',
-                                icon: Icons.speed,
-                              ),
-                            ),
-                          ],
+                        // INFO GRID MELHORADO (3 COLUNAS) - Responsivo
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final isSmallScreen = constraints.maxWidth < 360;
+                            return Row(
+                              children: [
+                                Expanded(
+                                  child: _buildInfoCardWaze(
+                                    value: _eta,
+                                    label: 'Chegada',
+                                    icon: Icons.schedule,
+                                  ),
+                                ),
+                                SizedBox(width: isSmallScreen ? 8 : 12),
+                                Expanded(
+                                  child: _buildInfoCardWaze(
+                                    value: '${_remainingDistance.toStringAsFixed(1)} km',
+                                    label: 'Distância',
+                                    icon: Icons.route,
+                                  ),
+                                ),
+                                SizedBox(width: isSmallScreen ? 8 : 12),
+                                Expanded(
+                                  child: _buildInfoCardWaze(
+                                    value: '${_currentSpeed.toStringAsFixed(0)} km/h',
+                                    label: 'Velocidade',
+                                    icon: Icons.speed,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
 
                         const SizedBox(height: 16),
 
-                        // BOTÃO SAIR (REDESENHADO)
-                        Container(
-                          width: double.infinity,
-                          height: 52,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: Colors.red.shade300,
-                              width: 2,
-                            ),
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () => _confirmExit(),
-                              borderRadius: BorderRadius.circular(14),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.close_rounded,
-                                    color: Colors.red.shade600,
-                                    size: 24,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    'Sair da navegação',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.red.shade600,
-                                      letterSpacing: 0.2,
-                                    ),
-                                  ),
-                                ],
+                        // BOTÃO SAIR (REDESENHADO) - Responsivo
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final screenHeight = MediaQuery.of(context).size.height;
+                            final buttonHeight = screenHeight < 600 ? 48.0 : 52.0;
+                            final fontSize = screenHeight < 600 ? 14.0 : 16.0;
+                            
+                            return Container(
+                              width: double.infinity,
+                              height: buttonHeight,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: Colors.red.shade300,
+                                  width: 2,
+                                ),
                               ),
-                            ),
-                          ),
+                              child: Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () => _confirmExit(),
+                                  borderRadius: BorderRadius.circular(14),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.close_rounded,
+                                        color: Colors.red.shade600,
+                                        size: screenHeight < 600 ? 20 : 24,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Flexible(
+                                        child: Text(
+                                          'Sair da navegação',
+                                          style: TextStyle(
+                                            fontSize: fontSize,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.red.shade600,
+                                            letterSpacing: 0.2,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ],
                     ),
@@ -917,6 +943,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
               fontWeight: FontWeight.w600,
               letterSpacing: 0.2,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
           ),
         ],
       ),
